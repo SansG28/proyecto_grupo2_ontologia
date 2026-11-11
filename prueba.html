@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Territorio Inteligente: Villa Verde - Residuos y RAEE</title>
+    <title>Territorio Inteligente Manizales · Gestión Experta y Difusa de Residuos y RAEE</title>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,7 +14,7 @@
                 extend: {
                     colors: {
                         eco: {
-                            500: '#10b981', // Emerald
+                            500: '#10b981',
                             600: '#059669',
                             900: '#064e3b',
                         }
@@ -29,7 +30,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -38,7 +39,7 @@
         }
         /* Efecto Cristal (Glassmorphism) */
         .glass-card {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -54,7 +55,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0b1120; }
         ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
@@ -62,15 +62,35 @@
         .map-marker .marker-halo { opacity: 0; transition: opacity 0.2s ease; }
         .map-marker:hover .marker-halo,
         .map-marker:focus .marker-halo,
-        .map-marker.selected .marker-halo { opacity: 0.25; }
+        .map-marker.selected .marker-halo { opacity: 0.3; }
         .map-marker:focus circle:not(.marker-halo) { stroke-width: 4; }
-        #route-layer path { animation: route-flow 18s linear infinite; }
-        @keyframes route-flow { to { stroke-dashoffset: -120; } }
+        #route-layer path,
+        #route-layer polyline {
+            animation: route-flow 16s linear infinite;
+        }
+        @keyframes route-flow {
+            to { stroke-dashoffset: -120; }
+        }
+        #map { min-height: 520px; position: relative; }
+        .mapboxgl-ctrl-attrib { font-size: 10px; }
+        .mapbox-marker { cursor: pointer; border: 0; background: transparent; }
+        .mapbox-marker span {
+            display: grid;
+            width: 30px;
+            height: 30px;
+            place-items: center;
+            border: 2px solid white;
+            border-radius: 9999px;
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            box-shadow: 0 2px 8px #0008;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
 
-    <!-- Encabezado -->
+    <!-- Encabezado Principal -->
     <header class="sticky top-0 z-50 glass-card border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -78,21 +98,21 @@
                     <i class="fa-solid fa-leaf text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-none animated-gradient-text">Villa Verde Smart</h1>
-                    <span class="text-[11px] text-gray-400">Gestión Ontológica y Difusa de Residuos</span>
+                    <h1 class="font-bold text-lg leading-none animated-gradient-text">Villa Verde Smart · Manizales</h1>
+                    <span class="text-[11px] text-gray-400">Gestión Ontológica (<code>ontology/villa_verde_v3.owl</code>) y Motor Difuso de Residuos</span>
                 </div>
             </div>
 
             <!-- Navegación de Pestañas -->
-            <nav class="flex items-center space-x-1 sm:space-x-2 bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+            <nav class="flex items-center space-x-1 sm:space-x-2 bg-gray-900/80 p-1 rounded-xl border border-gray-800" aria-label="Pestañas del sistema">
                 <button onclick="switchTab('ontologia')" id="btn-tab-ontologia" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-emerald-600 text-white shadow-md flex items-center gap-2">
-                    <i class="fa-solid fa-project-diagram"></i> <span class="hidden md:inline">Mapa Ontológico</span>
+                    <i class="fa-solid fa-project-diagram"></i> <span class="hidden md:inline">Mapa de la Ontología</span>
                 </button>
-                <button onclick="switchTab('simulador')" id="btn-tab-simulador" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white flex items-center gap-2">
-                    <i class="fa-solid fa-route"></i> <span class="hidden md:inline">Simulador Difuso</span>
+                <button onclick="switchTab('motor')" id="btn-tab-motor" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-route"></i> <span class="hidden md:inline">Motor Difuso (Rutas)</span>
                 </button>
                 <button onclick="switchTab('matriz')" id="btn-tab-matriz" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white flex items-center gap-2">
-                    <i class="fa-solid fa-scale-balanced"></i> <span class="hidden md:inline">Criterios y Ciudadanía</span>
+                    <i class="fa-solid fa-scale-balanced"></i> <span class="hidden md:inline">Matriz de Criterios (Ciudadanía)</span>
                 </button>
             </nav>
         </div>
@@ -101,195 +121,291 @@
     <!-- Contenedor Principal -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
 
-        <!-- ================= PESTAÑA 1: MAPA ONTOLÓGICO ================= -->
+        <!-- ================= PESTAÑA 1: MAPA DE LA ONTOLOGÍA ================= -->
         <section id="tab-ontologia" class="tab-content space-y-6">
-            <div class="glass-card p-4 rounded-2xl flex justify-between items-center">
+            <div class="glass-card glass-card-hover p-4 rounded-2xl flex flex-wrap gap-3 justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-map-location-dot text-emerald-400 mr-2"></i>Mapa operativo simulado</h2>
-                    <p class="text-xs text-gray-400">Mapa esquemático ficticio para explorar comunas, veredas, puntos de acopio y vehículos.</p>
+                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-map-location-dot text-emerald-400 mr-2"></i>Mapa de la Ontología · Red Territorial de Manizales, Caldas</h2>
+                    <p class="text-xs text-gray-400">Geolocalización de comunas, veredas aledañas (La Cabaña, El Rosario, Alto del Guamo, Río Blanco), nodos hito de referencia y flota activa.</p>
                 </div>
-                <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-bold uppercase tracking-wider">Datos de demostración</span>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span id="owl-badge" class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold tracking-wider">
+                        <i class="fa-solid fa-diagram-project mr-1"></i>OWL: ontology/villa_verde_v3.owl
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">Datos Operativos en Producción</span>
+                </div>
+            </div>
+
+            <!-- Tarjeta de Regla de Nodos de Referencia (Barrio -> Hito) -->
+            <div class="glass-card glass-card-hover p-4 rounded-2xl border border-gray-800 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="w-7 h-7 rounded-lg bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                            <i class="fa-solid fa-sitemap"></i>
+                        </span>
+                        <div>
+                            <span class="font-bold text-white">Regla de Nodos de Referencia (Agrupación Barrial → Hito de Acopio):</span>
+                            <span class="text-gray-400 ml-1">Consulta cualquier barrio de Manizales para ubicar su nodo principal.</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <input id="barrio-search-input" type="text" value="La Carola" placeholder="Ej. La Carola, El Cable, Solferino..." class="rounded-lg bg-gray-900 border border-gray-700 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                        <button id="btn-resolve-barrio" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white shadow-md shadow-emerald-500/20 transition-all">
+                            <i class="fa-solid fa-magnifying-glass-location mr-1"></i>Localizar Hito
+                        </button>
+                        <button type="button" onclick="quickResolveBarrio('La Carola')" class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-[11px] font-semibold text-amber-300 border border-amber-500/30 transition-all">La Carola → Mall Plaza</button>
+                        <button type="button" onclick="quickResolveBarrio('Los Agustinos')" class="px-2.5 py-1 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-[11px] font-semibold text-cyan-300 border border-cyan-500/30 transition-all">Centro → Plaza de Bolívar</button>
+                        <button type="button" onclick="quickResolveBarrio('El Cable')" class="px-2.5 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-[11px] font-semibold text-purple-300 border border-purple-500/30 transition-all">El Cable → Torre del Cable</button>
+                    </div>
+                </div>
+                <div id="barrio-resolution-banner" class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/60 via-slate-900/80 to-cyan-950/50 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2 text-emerald-200">
+                        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                        <span><strong>Asignación Ontológica:</strong> Reportes en el barrio <strong>La Carola</strong> (junto con Los Cámbulos, Villahermosa y Alta Suiza) convergen al nodo principal <strong>Mall Plaza</strong> (<code>Av. Kevin Ángel · -75.48322, 5.06941</code>).</span>
+                    </div>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-[10px]">Individuo OWL: #Nodo_Mall_Plaza</span>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Mapa esquemático -->
+                <!-- Mapa Territorial de Manizales -->
                 <div class="lg:col-span-2 glass-card p-4 sm:p-6 rounded-2xl border border-gray-700 bg-gray-900/30">
                     <div class="flex flex-wrap gap-2 items-center justify-between mb-4">
                         <div class="flex flex-wrap gap-2 text-[10px]">
-                            <span class="px-2 py-1 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">6 comunas</span>
-                            <span class="px-2 py-1 rounded bg-sky-500/10 text-sky-300 border border-sky-500/30">8 veredas</span>
-                            <span class="px-2 py-1 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">7 acopios</span>
-                            <span class="px-2 py-1 rounded bg-purple-500/10 text-purple-300 border border-purple-500/30">6 camiones</span>
+                            <span id="count-comunas" class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-300 border border-blue-500/30 font-semibold">9 comunas</span>
+                            <span id="count-veredas" class="px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-300 border border-sky-500/30 font-semibold">5 veredas y corregimientos</span>
+                            <span id="count-acopios" class="px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30 font-semibold">18 nodos hito</span>
+                            <span id="count-camiones" class="px-2.5 py-1 rounded-lg bg-purple-500/10 text-purple-300 border border-purple-500/30 font-semibold">9 camiones</span>
                         </div>
-                        <label class="flex items-center gap-2 text-[10px] text-gray-300 cursor-pointer">
+                        <label class="flex items-center gap-2 text-[11px] text-gray-300 cursor-pointer">
                             <input id="toggle-routes" type="checkbox" checked class="accent-emerald-500">
-                            Ver rutas sugeridas
+                            Ver rutas prioritarias activas
                         </label>
                     </div>
                     <div class="flex flex-wrap gap-2 mb-3" aria-label="Filtros del mapa">
-                        <button type="button" data-map-filter="all" aria-pressed="true" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-emerald-600 text-white">Todos</button>
-                        <button type="button" data-map-filter="location" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Zonas</button>
-                        <button type="button" data-map-filter="acopio" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Acopios</button>
-                        <button type="button" data-map-filter="truck" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Camiones</button>
+                        <button type="button" data-map-filter="all" aria-pressed="true" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-emerald-600 text-white">Todos los Nodos</button>
+                        <button type="button" data-map-filter="location" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Zonas (Comunas/Veredas)</button>
+                        <button type="button" data-map-filter="acopio" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Hitos de Acopio</button>
+                        <button type="button" data-map-filter="truck" aria-pressed="false" class="map-filter px-3 py-1 rounded-lg text-[10px] font-semibold bg-gray-800 text-gray-300">Camiones Recolectores</button>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 mb-3 p-2.5 rounded-xl bg-gray-900/70 border border-gray-800">
+                        <label for="route-vehicle" class="text-[11px] font-semibold text-gray-300"><i class="fa-solid fa-truck text-purple-400 mr-1"></i>Unidad Operativa:</label>
+                        <select id="route-vehicle" class="rounded-lg bg-gray-950 border border-gray-700 px-2.5 py-1 text-[11px] text-white"></select>
+                        <button id="calculate-route" type="button" class="rounded-lg bg-emerald-600 hover:bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition-colors">
+                            <i class="fa-solid fa-route mr-1"></i>Calcular Ruta Prioritaria
+                        </button>
+                        <span id="route-status" class="text-[10px] text-emerald-300 font-medium" role="status"></span>
                     </div>
                     <div class="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-[10px] text-gray-400" aria-label="Leyenda del mapa">
-                        <span><b class="text-blue-300">C</b> Comuna</span>
-                        <span><b class="text-sky-300">V</b> Vereda</span>
-                        <span><b class="text-amber-300">A</b> Acopio</span>
-                        <span><b class="text-purple-300">T</b> Camión</span>
+                        <span><b class="text-blue-300">C</b> Comuna Urbana</span>
+                        <span><b class="text-sky-300">V</b> Vereda / Corregimiento</span>
+                        <span><b class="text-amber-300">A</b> Nodo Hito de Acopio</span>
+                        <span><b class="text-purple-300">T</b> Camión Recolector</span>
                     </div>
-                    <div class="rounded-xl border border-gray-700 overflow-hidden bg-slate-950">
-                        <svg id="simulated-map" viewBox="0 0 800 500" role="img" aria-label="Mapa esquemático con comunas, veredas, puntos de acopio y camiones" class="w-full h-auto">
-                            <defs>
-                                <pattern id="map-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-                                    <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1e293b" stroke-width="1"/>
-                                </pattern>
-                            </defs>
-                            <rect width="800" height="500" fill="#0b1724"/>
-                            <rect width="800" height="500" fill="url(#map-grid)" opacity=".55"/>
-                            <path d="M0 180 C130 140 175 235 285 190 S450 110 540 170 690 220 800 145 M30 350 C160 290 215 390 330 325 S490 270 585 340 700 390 800 325 M200 0 C245 100 180 170 260 250 S340 390 300 500 M520 0 C480 105 570 190 500 260 S550 390 510 500 M0 75 C150 115 205 50 315 95 S520 90 650 45 740 70 800 55" fill="none" stroke="#26394a" stroke-width="13" stroke-linecap="round"/>
-                            <path d="M0 180 C130 140 175 235 285 190 S450 110 540 170 690 220 800 145 M30 350 C160 290 215 390 330 325 S490 270 585 340 700 390 800 325 M200 0 C245 100 180 170 260 250 S340 390 300 500 M520 0 C480 105 570 190 500 260 S550 390 510 500 M0 75 C150 115 205 50 315 95 S520 90 650 45 740 70 800 55" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
-                            <g fill="#94a3b8" font-size="12" font-family="Inter, sans-serif" opacity=".8">
-                                <text x="260" y="145">COMUNA 1 · CENTRO</text>
-                                <text x="365" y="64">COMUNA 2 · NORTE</text>
-                                <text x="455" y="220">COMUNA 3 · PARQUE</text>
-                                <text x="620" y="285">COMUNA 4 · INDUSTRIAL</text>
-                                <text x="330" y="395">COMUNA 5 · SUR</text>
-                                <text x="630" y="110">COMUNA 6 · ORIENTE</text>
-                                <text x="18" y="30" fill="#38bdf8">ZONA RURAL</text>
-                            </g>
-                            <g id="route-layer">
-                                <path d="M405 240 C360 205 315 175 270 145 S185 110 125 95 M405 240 C450 215 510 190 575 175 S650 150 700 130 M405 240 C390 290 375 330 350 370 S300 410 255 435" fill="none" stroke="#34d399" stroke-width="3" stroke-dasharray="8 7" opacity=".8"/>
-                            </g>
-                            <g id="map-markers"></g>
-                        </svg>
+                    <div class="rounded-xl border border-gray-700 overflow-hidden bg-slate-950 shadow-inner">
+                        <div id="map" role="application" aria-label="Mapa operativo de Manizales, Caldas"></div>
                     </div>
-                    <p class="text-[10px] text-gray-500 mt-2">Esquema ilustrativo: las posiciones y rutas no representan coordenadas ni recorridos reales. Selecciona un marcador para ver sus detalles.</p>
+                    <p class="text-[10px] text-gray-400 mt-2 flex justify-between">
+                        <span><i class="fa-solid fa-compass text-emerald-400 mr-1"></i>Coordenadas operativas de Manizales, Caldas (<code>-75.588° a -75.442° O, 5.035° a 5.119° N</code>).</span>
+                        <span>Haz clic en cualquier nodo para inspeccionarlo.</span>
+                    </p>
                 </div>
 
-                <!-- Panel Inspector -->
-                <div id="map-inspector" class="glass-card p-6 rounded-2xl border border-gray-800" aria-live="polite">
-                    <div class="border-b border-gray-700 pb-3 mb-4">
-                        <span id="inspector-type" class="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2 py-1 rounded">Punto de Acopio</span>
-                        <h3 id="inspector-name" class="text-lg font-bold text-white mt-2">Acopio Central</h3>
+                <!-- Panel Inspector y Eventos Operativos -->
+                <div class="space-y-6">
+                    <div id="map-inspector" class="glass-card glass-card-hover p-6 rounded-2xl border border-gray-800" aria-live="polite">
+                        <div class="border-b border-gray-700 pb-3 mb-4 flex justify-between items-start">
+                            <div>
+                                <span id="inspector-type" class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-md">Nodo Hito de Acopio</span>
+                                <h3 id="inspector-name" class="text-lg font-bold text-white mt-2">Mall Plaza</h3>
+                            </div>
+                            <span id="inspector-coords" class="font-mono text-[10px] text-gray-400 bg-gray-900 px-2 py-1 rounded border border-gray-800">-75.4832, 5.0694</span>
+                        </div>
+                        <div class="space-y-3.5">
+                            <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
+                                <span id="inspector-place-label" class="text-gray-400">Ubicación / Zona</span>
+                                <span id="inspector-place" class="font-mono text-cyan-400 text-right">Cerro de Oro · Eje Comercial</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
+                                <span id="inspector-status-label" class="text-gray-400">Nivel de Saturación</span>
+                                <span id="inspector-status" class="font-bold text-amber-400">64% ordinarios · 68% RAEE</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
+                                <span id="inspector-extra-label" class="text-gray-400">Barrios Cubiertos</span>
+                                <span id="inspector-extra" class="font-bold text-emerald-400 text-right">La Carola, Los Cámbulos, Villahermosa</span>
+                            </div>
+                        </div>
+                        <p id="inspector-description" class="text-xs text-gray-300 leading-relaxed mt-4 p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            Av. Kevin Ángel con Calle 55 · Sector La Carola. Recibe: Celulares, Baterías, Cables, Computadores.
+                        </p>
+                        <button type="button" onclick="switchTab('motor')" class="w-full mt-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-xs font-bold text-white shadow-lg shadow-emerald-500/20 transition-all">
+                            <i class="fa-solid fa-sliders mr-1"></i>Ajustar este Nodo en el Motor Difuso →
+                        </button>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
-                            <span id="inspector-place-label" class="text-gray-400">Ubicación</span>
-                            <span id="inspector-place" class="font-mono text-cyan-400 text-right">Comuna 3 · Parque</span>
+
+                    <!-- Eventos Climáticos y Quejas Activas en Manizales -->
+                    <div class="glass-card p-5 rounded-2xl border border-gray-800">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-white">
+                                <i class="fa-solid fa-bolt-lightning text-amber-400 mr-1"></i> Eventos Climáticos y Quejas en Manizales
+                            </h3>
+                            <span id="events-count-badge" class="px-2 py-0.5 rounded bg-gray-800 text-[10px] font-mono text-cyan-300">11 activos</span>
                         </div>
-                        <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
-                            <span id="inspector-status-label" class="text-gray-400">Estado</span>
-                            <span id="inspector-status" class="font-bold text-red-400">85% · Alta</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs border-b border-gray-800 pb-2">
-                            <span id="inspector-extra-label" class="text-gray-400">Tipo de residuo</span>
-                            <span id="inspector-extra" class="font-bold text-emerald-400">Ordinarios y RAEE</span>
-                        </div>
-                    </div>
-                    <p id="inspector-description" class="text-xs text-gray-400 leading-relaxed mt-4">Punto principal de recepción de residuos y aparatos eléctricos y electrónicos.</p>
-                    <div class="mt-5 pt-4 border-t border-gray-800 text-[10px] text-gray-500">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Selecciona cualquier marcador del mapa para inspeccionarlo.
+                        <div id="active-events-list" class="space-y-2.5 max-h-60 overflow-y-auto pr-1 text-[11px]"></div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ================= PESTAÑA 2: SIMULADOR DIFUSO ================= -->
-        <section id="tab-simulador" class="tab-content hidden space-y-6">
-            <div class="glass-card p-4 rounded-2xl">
-                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-microchip text-cyan-400 mr-2"></i>Simulador de Inferencia Difusa y Rutas</h2>
-                <p class="text-xs text-gray-400">Ajusta las variables de entrada para ver cómo el sistema prioriza la ruta del camión de manera explicable.</p>
+        <!-- ================= PESTAÑA 2: MOTOR DIFUSO (RUTAS) ================= -->
+        <section id="tab-motor" class="tab-content hidden space-y-6">
+            <div class="glass-card p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-microchip text-cyan-400 mr-2"></i>Panel de Inferencia Difusa y Cálculo de Rutas</h2>
+                    <p class="text-xs text-gray-400">Ajusta las variables operativas del nodo para evaluar las reglas SI-ENTONCES y reordenar automáticamente la ruta del camión recolector.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" id="preset-mall-plaza-90" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all">
+                        <i class="fa-solid fa-arrow-trend-up mr-1"></i>Caso Operativo: Mall Plaza al 90%
+                    </button>
+                    <button type="button" id="preset-guamo-clima" class="px-3 py-1.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 border border-red-500/40 text-red-300 text-xs font-semibold transition-all">
+                        <i class="fa-solid fa-cloud-showers-water mr-1"></i>Caso Extremo: Alto del Guamo (Derrumbe Vial)
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Entradas (Inputs) -->
-                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-cyan-500">
-                    <h3 class="text-sm font-bold text-white mb-4">1. Variables de Entrada</h3>
-                    
+                <!-- 1. Variables de Entrada -->
+                <div class="glass-card glass-card-hover p-5 rounded-2xl border-t-4 border-t-cyan-500">
+                    <h3 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-sliders text-cyan-400 mr-1.5"></i>1. Variables de Entrada</h3>
+
                     <div class="space-y-5">
-                        <!-- Saturación -->
                         <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <label class="text-gray-300">Saturación del Acopio</label>
-                                <span class="text-red-400 font-bold">85% (Alta)</span>
-                            </div>
-                            <input type="range" min="0" max="100" value="85" class="w-full accent-cyan-500 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                            <label for="inference-point" class="block text-xs font-semibold text-gray-300 mb-1">Nodo Hito de Acopio (Manizales)</label>
+                            <select id="inference-point" class="w-full rounded-xl bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"></select>
+                            <p id="inference-point-barrios" class="text-[10px] text-cyan-400 mt-1.5 leading-snug"></p>
                         </div>
-                        
+
+                        <!-- Saturación -->
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <label for="saturation-slider" class="text-gray-300 font-medium">Saturación del Acopio</label>
+                                <span id="saturation-value" class="text-red-400 font-bold">64% (Alta)</span>
+                            </div>
+                            <input id="saturation-slider" type="range" min="0" max="100" value="64" class="w-full accent-cyan-500 bg-gray-800 h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                <span>0% Baja</span>
+                                <span>50% Media</span>
+                                <span>90%+ Crítica</span>
+                            </div>
+                        </div>
+
                         <!-- Accesibilidad -->
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <label class="text-gray-300">Accesibilidad (Vía/Clima)</label>
-                                <span class="text-amber-400 font-bold">Regular</span>
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <label class="text-gray-300 font-medium">Accesibilidad (Vía / Clima)</label>
+                                <span id="accessibility-label" class="text-amber-400 font-bold">Buena</span>
                             </div>
                             <div class="flex gap-2 mt-1">
-                                <button class="flex-1 py-1 text-xs bg-gray-800 rounded border border-gray-700 text-gray-400 hover:bg-gray-700">Buena</button>
-                                <button class="flex-1 py-1 text-xs bg-cyan-900/50 border border-cyan-500 text-cyan-300 rounded">Regular</button>
-                                <button class="flex-1 py-1 text-xs bg-gray-800 rounded border border-gray-700 text-gray-400 hover:bg-gray-700">Mala</button>
+                                <button type="button" data-accessibility="Buena" class="accessibility-option flex-1 py-1.5 text-xs bg-cyan-900/50 border border-cyan-500 text-cyan-300 rounded-lg font-semibold transition-all">Buena</button>
+                                <button type="button" data-accessibility="Regular" class="accessibility-option flex-1 py-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 text-gray-400 hover:bg-gray-700 transition-all">Regular</button>
+                                <button type="button" data-accessibility="Mala" class="accessibility-option flex-1 py-1.5 text-xs bg-gray-800 rounded-lg border border-gray-700 text-gray-400 hover:bg-gray-700 transition-all">Mala</button>
                             </div>
                         </div>
 
                         <!-- Días sin servicio -->
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <label class="text-gray-300">Días sin servicio (Veredas)</label>
-                                <span class="text-cyan-400 font-bold">4 días</span>
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <label for="days-slider" class="text-gray-300 font-medium">Días sin servicio (Equidad Veredal)</label>
+                                <span id="days-value" class="text-cyan-400 font-bold">2 días</span>
                             </div>
-                            <input type="range" min="0" max="15" value="4" class="w-full accent-cyan-500 bg-gray-800 h-1.5 rounded-lg appearance-none cursor-pointer">
+                            <input id="days-slider" type="range" min="0" max="15" value="2" class="w-full accent-cyan-500 bg-gray-800 h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                <span>0 d (Al día)</span>
+                                <span>5 d (Varios)</span>
+                                <span>10+ d (Desatendida)</span>
+                            </div>
                         </div>
                     </div>
 
-                    <button class="w-full mt-6 py-2 rounded-lg bg-emerald-600 font-bold text-xs text-white hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">
-                        Ejecutar Motor Mamdani
+                    <button id="run-inference" type="button" class="w-full mt-5 py-2.5 rounded-xl bg-emerald-600 font-bold text-xs text-white hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">
+                        <i class="fa-solid fa-gears mr-1.5"></i>Ejecutar Motor Mamdani y Actualizar Ruta
                     </button>
+                    <p id="inference-status" class="text-[10px] text-emerald-400 mt-2 text-center" role="status"></p>
                 </div>
 
-                <!-- Base de Reglas -->
-                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-purple-500">
-                    <h3 class="text-sm font-bold text-white mb-4">2. Reglas Activadas (BC)</h3>
-                    <div class="space-y-3 text-[11px] font-mono">
-                        <div class="p-3 rounded bg-purple-900/30 border border-purple-500/50 text-gray-300">
-                            <span class="text-purple-400 font-bold">R12:</span> SI <span class="text-white">Saturación</span> es <span class="text-red-400">ALTA</span> Y <span class="text-white">Sensibilidad</span> es <span class="text-red-400">ALTA</span> ENTONCES <span class="text-white">Criticidad</span> = <span class="text-red-400">CRÍTICA</span>
-                        </div>
-                        <div class="p-3 rounded bg-gray-800 border border-gray-700 text-gray-500 opacity-60">
-                            <span class="text-gray-400 font-bold">R18:</span> SI Accesibilidad es MALA ENTONCES Prioridad = APLAZADA
-                        </div>
-                        <div class="p-3 rounded bg-emerald-900/30 border border-emerald-500/50 text-gray-300">
-                            <span class="text-emerald-400 font-bold">R25:</span> SI <span class="text-white">Criticidad</span> es <span class="text-red-400">CRÍTICA</span> Y <span class="text-white">Accesibilidad</span> es <span class="text-amber-400">REGULAR</span> ENTONCES <span class="text-white">Prioridad</span> = <span class="text-red-400">INMEDIATA</span>
-                        </div>
-                    </div>
+                <!-- 2. Base de Reglas SI-ENTONCES -->
+                <div class="glass-card glass-card-hover p-5 rounded-2xl border-t-4 border-t-purple-500 flex flex-col">
+                    <h3 class="text-sm font-bold text-white mb-3"><i class="fa-solid fa-code-branch text-purple-400 mr-1.5"></i>2. Reglas Activadas (Base de Conocimiento)</h3>
+                    <div id="membership-summary" class="grid grid-cols-3 gap-2 mb-3 text-[10px] font-mono"></div>
+                    <div id="activated-rules" class="space-y-3 text-[11px] font-mono flex-grow overflow-y-auto max-h-80 pr-1" aria-live="polite"></div>
                 </div>
 
-                <!-- Salida y Explicabilidad -->
-                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-emerald-500 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-4">3. Salida de Priorización</h3>
-                    
-                    <div class="flex-grow flex flex-col justify-center items-center p-4 bg-gray-900/50 rounded-xl border border-gray-800 mb-4">
+                <!-- 3. Salida y Explicabilidad -->
+                <div class="glass-card glass-card-hover p-5 rounded-2xl border-t-4 border-t-emerald-500 flex flex-col">
+                    <h3 class="text-sm font-bold text-white mb-4"><i class="fa-solid fa-gauge-high text-emerald-400 mr-1.5"></i>3. Salida de Priorización</h3>
+
+                    <div class="flex-grow flex flex-col justify-center items-center p-5 bg-gray-900/60 rounded-2xl border border-gray-800 mb-4 relative overflow-hidden">
+                        <div class="absolute -top-10 -right-10 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl"></div>
                         <span class="text-xs text-gray-400 uppercase tracking-wider mb-1">Nivel de Prioridad de Ruta</span>
-                        <span class="text-3xl font-extrabold text-red-500 drop-shadow-md">92%</span>
-                        <span class="px-3 py-1 mt-2 text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30 rounded-full">Atención Inmediata</span>
+                        <span id="priority-score" class="text-4xl font-extrabold text-red-400 drop-shadow-md">63.7%</span>
+                        <span id="priority-label" class="px-3.5 py-1 mt-2 text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">Atención Alta</span>
+                        <div id="route-rank-badge" class="mt-3 px-3 py-1 rounded-lg bg-cyan-950/70 border border-cyan-500/30 text-[11px] text-cyan-300 font-semibold"></div>
                     </div>
 
-                    <div class="bg-gray-950 p-3 rounded-lg font-mono text-[10px] text-gray-400 border border-gray-800">
-                        <span class="text-emerald-400 font-bold">>> TRAZA DE EXPLICABILIDAD:</span><br>
-                        Se prioriza la ruta del Compactador 02 hacia "Acopio Central" debido a riesgo sanitario inminente (Contenedor al 85% cerca a zona escolar), superando la limitación de vía regular. Sesgos como 'Visita de Alcaldía' han sido excluidos.
+                    <div class="bg-gray-950 p-3.5 rounded-xl font-mono text-[10px] text-gray-300 border border-gray-800 space-y-2">
+                        <div>
+                            <span class="text-emerald-400 font-bold">&gt;&gt; TRAZA DE EXPLICABILIDAD:</span><br>
+                            <span id="explanation" class="leading-relaxed"></span>
+                        </div>
+                        <div class="pt-2 border-t border-gray-800 flex justify-between items-center">
+                            <span class="text-cyan-400 font-bold">&gt;&gt; UNIDAD ASIGNADA:</span>
+                            <span id="recommended-vehicle" class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">Compactador</span>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Tabla Dinámica del Orden de la Ruta del Camión -->
+            <div class="glass-card p-6 rounded-2xl border border-gray-800">
+                <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                    <div>
+                        <h3 class="text-sm font-bold text-white"><i class="fa-solid fa-truck-fast text-emerald-400 mr-2"></i>Orden de Despacho de la Ruta del Camión (Tiempo Real)</h3>
+                        <p class="text-xs text-gray-400">Al modificar la saturación o condición vial de un nodo (ej. <strong>Mall Plaza al 90%</strong>), el motor reordena la secuencia de atención de la flota.</p>
+                    </div>
+                    <span id="route-order-highlight" class="px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-xs font-semibold text-amber-300"></span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-gray-800">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-gray-900/90 text-gray-400 font-mono text-[11px]">
+                            <tr>
+                                <th class="p-3">Orden</th>
+                                <th class="p-3">Nodo Hito (Manizales)</th>
+                                <th class="p-3">Barrios Agrupados</th>
+                                <th class="p-3">Saturación</th>
+                                <th class="p-3">Días sin Servicio</th>
+                                <th class="p-3">Estado Vial</th>
+                                <th class="p-3">Puntaje Difuso</th>
+                                <th class="p-3">Nivel de Prioridad</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic-route-table" class="divide-y divide-gray-800 text-gray-300"></tbody>
+                    </table>
                 </div>
             </div>
         </section>
 
-        <!-- ================= PESTAÑA 3: CRITERIOS Y CIUDADANÍA ================= -->
+        <!-- ================= PESTAÑA 3: MATRIZ DE CRITERIOS (CIUDADANÍA) ================= -->
         <section id="tab-matriz" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
+
                 <!-- Matriz Ética -->
-                <div class="glass-card p-6 rounded-2xl">
+                <div class="glass-card glass-card-hover p-6 rounded-2xl">
                     <div class="mb-4">
-                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i>Matriz Ética de Criterios</h2>
-                        <p class="text-xs text-gray-400">Filtro de reglas operativas vs. sesgos excluidos en la base de conocimiento.</p>
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-list-check text-amber-400 mr-2"></i>Matriz Ética de Criterios (`ontology/villa_verde_v3.owl`)</h2>
+                        <p class="text-xs text-gray-400">Filtro de reglas operativas (`#CriterioLegitimo`) vs. sesgos excluidos (`#CriterioExcluido`) en la base de conocimiento.</p>
                     </div>
-                    
+
                     <div class="overflow-x-auto rounded-lg border border-gray-800">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-gray-900/80 text-gray-400 font-mono">
@@ -301,19 +417,24 @@
                             </thead>
                             <tbody class="divide-y divide-gray-800 text-gray-300">
                                 <tr class="bg-gray-800/20">
-                                    <td class="p-3 text-white italic">"Si llovió, no subimos a la loma"</td>
-                                    <td class="p-3"><span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Formalizado</span></td>
-                                    <td class="p-3">Se modela como variable <span class="text-cyan-300">Accesibilidad</span> cruzada con Evento Climático.</td>
+                                    <td class="p-3 text-white italic">"En La Carola cada cuadra pide ruta por separado"</td>
+                                    <td class="p-3"><span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Regla de Hito</span></td>
+                                    <td class="p-3">Se agrupa mediante <span class="text-cyan-300">#consolidaEnNodo</span> hacia el hito principal <strong>Mall Plaza</strong>.</td>
                                 </tr>
                                 <tr class="bg-gray-800/20">
-                                    <td class="p-3 text-white italic">"Visita de la Alcaldía, limpiamos plaza"</td>
+                                    <td class="p-3 text-white italic">"Si llovió en La Cabaña o Alto del Guamo, no subimos"</td>
+                                    <td class="p-3"><span class="px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">Formalizado</span></td>
+                                    <td class="p-3">Se modela como variable <span class="text-cyan-300">Accesibilidad</span> cruzada con <span class="text-cyan-300">#EventoClimatico</span> y despacho de <strong>Volqueta</strong>.</td>
+                                </tr>
+                                <tr class="bg-gray-800/20">
+                                    <td class="p-3 text-white italic">"Visita oficial en el Centro, limpiamos solo esa plaza"</td>
                                     <td class="p-3"><span class="px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold">Sesgo Excluido</span></td>
-                                    <td class="p-3">Violación ética (Visibilidad Política). La prioridad se basa estrictamente en riesgo sanitario.</td>
+                                    <td class="p-3">Individuo <span class="text-red-300">#Criterio_PresionPolitica</span>: la prioridad se basa estrictamente en riesgo sanitario.</td>
                                 </tr>
                                 <tr class="bg-gray-800/20">
                                     <td class="p-3 text-white italic">"El operario conoce a la familia"</td>
                                     <td class="p-3"><span class="px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20 text-[10px] font-bold">Sesgo Excluido</span></td>
-                                    <td class="p-3">Genera inequidad. Sustituido por variable <span class="text-cyan-300">Días sin Servicio</span>.</td>
+                                    <td class="p-3">Individuo <span class="text-red-300">#Criterio_RelacionesPersonales</span>: sustituido por <span class="text-cyan-300">#diasSinServicio</span>.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -321,29 +442,51 @@
                 </div>
 
                 <!-- Módulo Ciudadano RAEE -->
-                <div class="glass-card p-6 rounded-2xl relative overflow-hidden">
+                <div class="glass-card glass-card-hover p-6 rounded-2xl relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-bl-full -z-10 blur-xl"></div>
                     <div class="mb-4">
-                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-recycle text-emerald-400 mr-2"></i>Módulo Ciudadano: RAEE</h2>
-                        <p class="text-xs text-gray-400">Recomendaciones generadas por el sistema para los residentes.</p>
+                        <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-recycle text-emerald-400 mr-2"></i>Módulo Ciudadano: Separación de RAEE en Manizales</h2>
+                        <p class="text-xs text-gray-400">Recomendaciones de disposición segura y nodos de acopio cercanos según tu barrio.</p>
                     </div>
 
-                    <div class="space-y-4">
+                    <div class="space-y-4 mb-5">
                         <div class="p-4 bg-gray-900/60 rounded-xl border-l-4 border-emerald-500 flex gap-4 items-start">
                             <i class="fa-solid fa-mobile-screen-button text-2xl text-emerald-400 mt-1"></i>
                             <div>
-                                <h3 class="text-sm font-bold text-white mb-1">Punto de Acopio Sugerido</h3>
-                                <p class="text-xs text-gray-400 leading-relaxed">Detectamos que está en la <strong>Comuna 3</strong>. Lleve sus baterías y celulares antiguos al <strong>Acopio Central (Parque Principal)</strong>. El gestor autorizado realizará la recolección el día Jueves.</p>
+                                <h3 class="text-sm font-bold text-white mb-1">Residentes de La Carola, Los Cámbulos y Villahermosa → Nodo Mall Plaza</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">Lleve sus baterías, celulares, cables y computadores en desuso al contenedor especializado de <strong>Mall Plaza (Av. Kevin Ángel con Calle 55)</strong>, gestionado por <strong>EcoCaldas RAEE</strong>.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-gray-900/60 rounded-xl border-l-4 border-cyan-500 flex gap-4 items-start">
+                            <i class="fa-solid fa-laptop-code text-2xl text-cyan-400 mt-1"></i>
+                            <div>
+                                <h3 class="text-sm font-bold text-white mb-1">Sector El Cable, Palogrande y Centro Histórico</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed">Dispositivos electrónicos, periféricos y baterías de litio se reciben en los nodos <strong>Torre del Cable</strong> y <strong>Plaza de Bolívar</strong>.</p>
                             </div>
                         </div>
 
                         <div class="p-4 bg-gray-900/60 rounded-xl border-l-4 border-yellow-500 flex gap-4 items-start">
                             <i class="fa-solid fa-triangle-exclamation text-2xl text-yellow-400 mt-1"></i>
                             <div>
-                                <h3 class="text-sm font-bold text-white mb-1">Alerta de Separación</h3>
-                                <p class="text-xs text-gray-400 leading-relaxed"><strong>¡No rompa las bombillas!</strong> Contienen mercurio (Residuo Peligroso). Almacénelas en cajas de cartón secas y espere a la jornada especial de fin de mes.</p>
+                                <h3 class="text-sm font-bold text-white mb-1">Alerta de Separación en Veredas (La Cabaña, El Rosario, Alto del Guamo)</h3>
+                                <p class="text-xs text-gray-400 leading-relaxed"><strong>¡No rompa las bombillas fluorescentes ni mezcle baterías!</strong> Contienen mercurio y metales pesados (<code>#TipoRAEEPeligroso</code>). Almacénelas en cajas de cartón secas para su entrega en el nodo veredal.</p>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-lg border border-gray-800 max-h-56">
+                        <table class="w-full text-left text-[11px]">
+                            <thead class="bg-gray-900 text-gray-400 font-mono">
+                                <tr>
+                                    <th class="p-2.5">Nodo Hito</th>
+                                    <th class="p-2.5">Barrios Cubiertos</th>
+                                    <th class="p-2.5">Tipos RAEE</th>
+                                    <th class="p-2.5">Saturación RAEE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="citizen-raee-table" class="divide-y divide-gray-800 text-gray-300"></tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -351,152 +494,7 @@
         </section>
     </main>
 
-    <!-- Datos y recorridos de demostración; no son ubicaciones reales. -->
-    <script>
-        const mapFeatures = [
-            { id: 'comuna-1', type: 'location', kind: 'Comuna', name: 'Comuna 1 · Centro', x: 275, y: 170, place: 'Sector central', status: 'Servicio activo', extra: 'Zona urbana', description: 'Área urbana central de ejemplo, conectada con los principales corredores viales.', marker: 'C' },
-            { id: 'comuna-2', type: 'location', kind: 'Comuna', name: 'Comuna 2 · Norte', x: 400, y: 105, place: 'Sector norte', status: 'Servicio activo', extra: 'Zona urbana', description: 'Zona residencial del norte incluida para ampliar la cobertura simulada.', marker: 'C' },
-            { id: 'comuna-3', type: 'location', kind: 'Comuna', name: 'Comuna 3 · Parque', x: 470, y: 230, place: 'Sector del parque', status: 'Servicio activo', extra: 'Zona urbana', description: 'Sector del parque principal y punto de referencia para las rutas de recolección.', marker: 'C' },
-            { id: 'comuna-4', type: 'location', kind: 'Comuna', name: 'Comuna 4 · Industrial', x: 650, y: 300, place: 'Sector industrial', status: 'Servicio activo', extra: 'Zona urbana', description: 'Área industrial ficticia con generación mixta de residuos.', marker: 'C' },
-            { id: 'comuna-5', type: 'location', kind: 'Comuna', name: 'Comuna 5 · Sur', x: 355, y: 385, place: 'Sector sur', status: 'Servicio activo', extra: 'Zona urbana', description: 'Sector sur incorporado al mapa de cobertura de la ciudad simulada.', marker: 'C' },
-            { id: 'comuna-6', type: 'location', kind: 'Comuna', name: 'Comuna 6 · Oriente', x: 655, y: 115, place: 'Sector oriental', status: 'Servicio activo', extra: 'Zona urbana', description: 'Sector oriental conectado a los corredores principales del mapa ilustrativo.', marker: 'C' },
-            { id: 'vereda-encanto', type: 'location', kind: 'Vereda', name: 'Vereda El Encanto', x: 90, y: 95, place: 'Corregimiento rural norte', status: '4 días sin servicio', extra: 'Zona rural · vía destapada', description: 'Vereda rural de ejemplo. La accesibilidad puede variar con el clima.', marker: 'V' },
-            { id: 'vereda-esperanza', type: 'location', kind: 'Vereda', name: 'Vereda La Esperanza', x: 115, y: 210, place: 'Corregimiento rural oeste', status: '2 días sin servicio', extra: 'Zona rural · vía mixta', description: 'Sector rural ficticio agregado para ampliar la cobertura de recolección.', marker: 'V' },
-            { id: 'vereda-alto-verde', type: 'location', kind: 'Vereda', name: 'Vereda Alto Verde', x: 100, y: 355, place: 'Ladera occidental', status: '5 días sin servicio', extra: 'Zona rural · pendiente alta', description: 'Vereda de ladera con acceso simulado por una vía secundaria.', marker: 'V' },
-            { id: 'vereda-san-miguel', type: 'location', kind: 'Vereda', name: 'Vereda San Miguel', x: 210, y: 435, place: 'Corregimiento rural sur', status: '3 días sin servicio', extra: 'Zona rural · vía destapada', description: 'Población rural de ejemplo al sur del área urbana.', marker: 'V' },
-            { id: 'vereda-pinos', type: 'location', kind: 'Vereda', name: 'Vereda Los Pinos', x: 720, y: 420, place: 'Corregimiento rural sureste', status: '1 día sin servicio', extra: 'Zona rural · vía mixta', description: 'Vereda ficticia al sureste conectada por un corredor secundario.', marker: 'V' },
-            { id: 'vereda-roble', type: 'location', kind: 'Vereda', name: 'Vereda El Roble', x: 745, y: 220, place: 'Corregimiento rural este', status: '6 días sin servicio', extra: 'Zona rural · acceso limitado', description: 'Vereda de ejemplo con acceso limitado en esta simulación.', marker: 'V' },
-            { id: 'vereda-laguna', type: 'location', kind: 'Vereda', name: 'Vereda La Laguna', x: 540, y: 455, place: 'Corregimiento rural suroriental', status: '2 días sin servicio', extra: 'Zona rural · vía destapada', description: 'Sector rural cercano a la zona suroriental del mapa simulado.', marker: 'V' },
-            { id: 'vereda-santa-rosa', type: 'location', kind: 'Vereda', name: 'Vereda Santa Rosa', x: 305, y: 55, place: 'Corregimiento rural norte', status: '3 días sin servicio', extra: 'Zona rural · vía mixta', description: 'Vereda ficticia al norte de la ciudad, atendida por rutas rurales.', marker: 'V' },
-            { id: 'acopio-central', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio Central', x: 405, y: 240, place: 'Comuna 3 · Parque', status: '85% · Alta', extra: 'Ordinarios y RAEE', description: 'Punto principal de recepción de residuos y aparatos eléctricos y electrónicos.', marker: 'A' },
-            { id: 'acopio-norte', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio Norte', x: 350, y: 125, place: 'Comuna 2 · Norte', status: '62% · Media', extra: 'Reciclables y RAEE', description: 'Punto de recepción de reciclables y RAEE para los sectores del norte.', marker: 'A' },
-            { id: 'acopio-oeste', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio La Esperanza', x: 190, y: 235, place: 'Comuna 1 · Occidente', status: '48% · Media', extra: 'Ordinarios y reciclables', description: 'Punto barrial de ejemplo para residentes del occidente.', marker: 'A' },
-            { id: 'acopio-industrial', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio Industrial', x: 590, y: 280, place: 'Comuna 4 · Industrial', status: '71% · Alta', extra: 'Ordinarios y especiales', description: 'Sitio de consolidación de residuos para la zona industrial ficticia.', marker: 'A' },
-            { id: 'acopio-sur', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio del Sur', x: 400, y: 350, place: 'Comuna 5 · Sur', status: '38% · Baja', extra: 'Reciclables y RAEE', description: 'Punto de acopio vecinal para los barrios del sur.', marker: 'A' },
-            { id: 'acopio-oriente', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio Oriente', x: 600, y: 155, place: 'Comuna 6 · Oriente', status: '55% · Media', extra: 'Ordinarios y reciclables', description: 'Punto de recepción para los sectores orientales de la ciudad simulada.', marker: 'A' },
-            { id: 'acopio-rural', type: 'acopio', kind: 'Punto de Acopio', name: 'Acopio Rural El Roble', x: 680, y: 390, place: 'Corredor rural oriental', status: '29% · Baja', extra: 'Reciclables y RAEE', description: 'Punto rural de consolidación para veredas cercanas.', marker: 'A' },
-            { id: 'truck-01', type: 'truck', kind: 'Camión recolector', name: 'Compactador 01', x: 300, y: 205, place: 'Ruta urbana centro', status: 'En recorrido', extra: '12 t', description: 'Vehículo de recolección urbana en una ruta de demostración.', marker: 'T' },
-            { id: 'truck-02', type: 'truck', kind: 'Camión recolector', name: 'Compactador 02', x: 430, y: 190, place: 'Ruta central · prioridad alta', status: 'En recorrido', extra: '10 t', description: 'Vehículo asignado a la atención prioritaria del Acopio Central.', marker: 'T' },
-            { id: 'truck-03', type: 'truck', kind: 'Camión recolector', name: 'Compactador 03', x: 555, y: 320, place: 'Ruta industrial', status: 'Disponible', extra: '12 t', description: 'Vehículo de apoyo para el corredor industrial.', marker: 'T' },
-            { id: 'truck-04', type: 'truck', kind: 'Camión recolector', name: 'Volqueta 04', x: 165, y: 315, place: 'Ruta rural occidental', status: 'En recorrido', extra: '8 t', description: 'Vehículo de apoyo para vías secundarias y sectores rurales.', marker: 'T' },
-            { id: 'truck-05', type: 'truck', kind: 'Camión recolector', name: 'Compactador 05', x: 520, y: 115, place: 'Ruta norte y oriente', status: 'Disponible', extra: '10 t', description: 'Vehículo asignado a sectores del norte y del oriente.', marker: 'T' },
-            { id: 'truck-06', type: 'truck', kind: 'Camión recolector', name: 'Volqueta 06', x: 610, y: 430, place: 'Ruta rural suroriental', status: 'En recorrido', extra: '8 t', description: 'Vehículo de apoyo para la cobertura de veredas al suroriente.', marker: 'T' }
-        ];
-
-        const markerColors = {
-            location: '#38bdf8',
-            acopio: '#fbbf24',
-            truck: '#c084fc'
-        };
-
-        function selectMapFeature(feature, markerElement) {
-            document.querySelectorAll('.map-marker').forEach(marker => marker.classList.remove('selected'));
-            markerElement.classList.add('selected');
-            document.getElementById('inspector-type').textContent = feature.kind;
-            document.getElementById('inspector-name').textContent = feature.name;
-            document.getElementById('inspector-place').textContent = feature.place;
-            document.getElementById('inspector-status').textContent = feature.status;
-            document.getElementById('inspector-extra').textContent = feature.extra;
-            document.getElementById('inspector-description').textContent = feature.description;
-            document.getElementById('inspector-place-label').textContent = feature.type === 'location' ? 'Sector' : 'Ubicación';
-            document.getElementById('inspector-status-label').textContent = feature.type === 'acopio' ? 'Saturación' : 'Estado';
-            document.getElementById('inspector-extra-label').textContent = feature.type === 'truck' ? 'Capacidad' : feature.type === 'location' ? 'Clasificación' : 'Residuos';
-            document.getElementById('inspector-type').style.color = markerColors[feature.type];
-        }
-
-        function renderMapMarkers() {
-            const markerLayer = document.getElementById('map-markers');
-            const svgNamespace = 'http://www.w3.org/2000/svg';
-
-            mapFeatures.forEach(feature => {
-                const marker = document.createElementNS(svgNamespace, 'g');
-                marker.setAttribute('class', 'map-marker');
-                marker.setAttribute('transform', `translate(${feature.x} ${feature.y})`);
-                marker.setAttribute('tabindex', '0');
-                marker.setAttribute('role', 'button');
-                marker.setAttribute('aria-label', `${feature.kind}: ${feature.name}`);
-                marker.dataset.type = feature.type;
-
-                const title = document.createElementNS(svgNamespace, 'title');
-                title.textContent = `${feature.name} · ${feature.status}`;
-                marker.appendChild(title);
-
-                const halo = document.createElementNS(svgNamespace, 'circle');
-                halo.setAttribute('class', 'marker-halo');
-                halo.setAttribute('r', '17');
-                halo.setAttribute('fill', markerColors[feature.type]);
-                marker.appendChild(halo);
-
-                const dot = document.createElementNS(svgNamespace, 'circle');
-                dot.setAttribute('r', '12');
-                dot.setAttribute('fill', '#0f172a');
-                dot.setAttribute('stroke', markerColors[feature.type]);
-                dot.setAttribute('stroke-width', '2');
-                marker.appendChild(dot);
-
-                const label = document.createElementNS(svgNamespace, 'text');
-                label.setAttribute('text-anchor', 'middle');
-                label.setAttribute('dominant-baseline', 'central');
-                label.setAttribute('fill', markerColors[feature.type]);
-                label.setAttribute('font-size', '10');
-                label.setAttribute('font-weight', '700');
-                label.textContent = feature.marker;
-                marker.appendChild(label);
-
-                const select = () => selectMapFeature(feature, marker);
-                marker.addEventListener('click', select);
-                marker.addEventListener('keydown', event => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        select();
-                    }
-                });
-                markerLayer.appendChild(marker);
-            });
-
-            const defaultFeature = mapFeatures.find(feature => feature.id === 'acopio-central');
-            const defaultMarker = Array.from(markerLayer.children).find(marker => marker.getAttribute('aria-label') === `${defaultFeature.kind}: ${defaultFeature.name}`);
-            selectMapFeature(defaultFeature, defaultMarker);
-        }
-
-        document.querySelectorAll('.map-filter').forEach(button => {
-            button.addEventListener('click', () => {
-                const filter = button.dataset.mapFilter;
-                document.querySelectorAll('.map-filter').forEach(filterButton => {
-                    const active = filterButton === button;
-                    filterButton.setAttribute('aria-pressed', String(active));
-                    filterButton.classList.toggle('bg-emerald-600', active);
-                    filterButton.classList.toggle('text-white', active);
-                    filterButton.classList.toggle('bg-gray-800', !active);
-                    filterButton.classList.toggle('text-gray-300', !active);
-                });
-                document.querySelectorAll('.map-marker').forEach(marker => {
-                    marker.style.display = filter === 'all' || marker.dataset.type === filter ? '' : 'none';
-                });
-            });
-        });
-
-        document.getElementById('toggle-routes').addEventListener('change', event => {
-            document.getElementById('route-layer').style.display = event.target.checked ? '' : 'none';
-        });
-
-        renderMapMarkers();
-
-        function switchTab(tabId) {
-            // Ocultar todos los contenidos
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            // Resetear botones
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
-                el.classList.add('text-gray-400');
-            });
-
-            // Mostrar el seleccionado
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`btn-tab-${tabId}`);
-            activeBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
-            activeBtn.classList.remove('text-gray-400');
-        }
-    </script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+    <script src="src/client.js"></script>
 </body>
 </html>

@@ -1,0 +1,1067 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/ontologies/2026/villa_verde#"
+     xml:base="http://www.semanticweb.org/ontologies/2026/villa_verde"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/ontologies/2026/villa_verde">
+        <rdfs:label xml:lang="es">Ontología de Gestión de Residuos Villa Verde v3 · Manizales, Caldas</rdfs:label>
+        <rdfs:comment xml:lang="es">Modelo conceptual y grafo de conocimiento alineado al 100% con la base de datos operativa de Manizales, Caldas (comunas, veredas y nodos de referencia como Mall Plaza, Plaza de Bolívar y Torre del Cable).</rdfs:comment>
+    </owl:Ontology>
+
+    <!-- ======================================================== -->
+    <!-- CLASSES (T-BOX)                                          -->
+    <!-- ======================================================== -->
+
+    <owl:Class rdf:about="#Residuo">
+        <rdfs:label xml:lang="es">Residuo</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ResiduoOrdinario">
+        <rdfs:subClassOf rdf:resource="#Residuo"/>
+        <rdfs:label xml:lang="es">Residuo Ordinario</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ResiduoRAEE">
+        <rdfs:subClassOf rdf:resource="#Residuo"/>
+        <rdfs:label xml:lang="es">Residuo RAEE</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TipoRAEE">
+        <rdfs:label xml:lang="es">Tipo RAEE</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#TipoRAEEPeligroso">
+        <rdfs:subClassOf rdf:resource="#TipoRAEE"/>
+        <rdfs:label xml:lang="es">Tipo RAEE Peligroso</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Zona">
+        <rdfs:label xml:lang="es">Zona</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ComunaUrbana">
+        <rdfs:subClassOf rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">Comuna Urbana</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Corregimiento">
+        <rdfs:subClassOf rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">Corregimiento</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Vereda">
+        <rdfs:subClassOf rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">Vereda</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ZonaDesatendida">
+        <rdfs:subClassOf rdf:resource="#Zona"/>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Zona"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#diasSinServicio"/>
+                        <owl:someValuesFrom>
+                            <rdfs:Datatype>
+                                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+                                <owl:withRestrictions rdf:parseType="Collection">
+                                    <rdf:Description>
+                                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</xsd:minInclusive>
+                                    </rdf:Description>
+                                </owl:withRestrictions>
+                            </rdfs:Datatype>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:label xml:lang="es">Zona desatendida</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ZonaVulnerable">
+        <rdfs:subClassOf rdf:resource="#Zona"/>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#Zona"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#porcentajeVulnerable"/>
+                        <owl:someValuesFrom>
+                            <rdfs:Datatype>
+                                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+                                <owl:withRestrictions rdf:parseType="Collection">
+                                    <rdf:Description>
+                                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">25.0</xsd:minInclusive>
+                                    </rdf:Description>
+                                </owl:withRestrictions>
+                            </rdfs:Datatype>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:label xml:lang="es">Zona vulnerable</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PuntoAcopio">
+        <rdfs:label xml:lang="es">Punto de acopio</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ContenedorOrdinario">
+        <rdfs:subClassOf rdf:resource="#PuntoAcopio"/>
+        <rdfs:label xml:lang="es">Contenedor Ordinario</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PuntoAcopioRAEE">
+        <rdfs:subClassOf rdf:resource="#PuntoAcopio"/>
+        <rdfs:label xml:lang="es">Punto Acopio RAEE</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PuntoSaturado">
+        <rdfs:subClassOf rdf:resource="#PuntoAcopio"/>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#PuntoAcopio"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#porcentajeSaturacion"/>
+                        <owl:someValuesFrom>
+                            <rdfs:Datatype>
+                                <owl:onDatatype rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+                                <owl:withRestrictions rdf:parseType="Collection">
+                                    <rdf:Description>
+                                        <xsd:minInclusive rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">80</xsd:minInclusive>
+                                    </rdf:Description>
+                                </owl:withRestrictions>
+                            </rdfs:Datatype>
+                        </owl:someValuesFrom>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:label xml:lang="es">Punto saturado</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PuntoEnEntornoSensible">
+        <rdfs:subClassOf rdf:resource="#PuntoAcopio"/>
+        <rdfs:label xml:lang="es">Punto en Entorno Sensible</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#PuntoCritico">
+        <rdfs:subClassOf rdf:resource="#PuntoAcopio"/>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="#PuntoSaturado"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#cercaDe"/>
+                        <owl:someValuesFrom rdf:resource="#EquipamientoSensible"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+        <rdfs:label xml:lang="es">Punto crítico</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Ruta">
+        <rdfs:label xml:lang="es">Ruta</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Vehiculo">
+        <rdfs:label xml:lang="es">Vehículo</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CamionCompactador">
+        <rdfs:subClassOf rdf:resource="#Vehiculo"/>
+        <rdfs:label xml:lang="es">Camión Compactador</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Volqueta">
+        <rdfs:subClassOf rdf:resource="#Vehiculo"/>
+        <rdfs:label xml:lang="es">Volqueta</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Gestor">
+        <rdfs:label xml:lang="es">Gestor</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#GestorAutorizado">
+        <rdfs:subClassOf rdf:resource="#Gestor"/>
+        <rdfs:label xml:lang="es">Gestor Autorizado</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#EventoClimatico">
+        <rdfs:label xml:lang="es">Evento climático</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Lluvia">
+        <rdfs:subClassOf rdf:resource="#EventoClimatico"/>
+        <rdfs:label xml:lang="es">Lluvia</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Deslizamiento">
+        <rdfs:subClassOf rdf:resource="#EventoClimatico"/>
+        <rdfs:label xml:lang="es">Deslizamiento</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#QuejaCiudadana">
+        <rdfs:label xml:lang="es">Queja ciudadana</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#EquipamientoSensible">
+        <rdfs:label xml:lang="es">Equipamiento sensible</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Colegio">
+        <rdfs:subClassOf rdf:resource="#EquipamientoSensible"/>
+        <rdfs:label xml:lang="es">Colegio</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CentroSalud">
+        <rdfs:subClassOf rdf:resource="#EquipamientoSensible"/>
+        <rdfs:label xml:lang="es">Centro de Salud</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#ReservaAmbiental">
+        <rdfs:subClassOf rdf:resource="#EquipamientoSensible"/>
+        <rdfs:label xml:lang="es">Reserva Ambiental</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#EtiquetaLinguistica">
+        <rdfs:label xml:lang="es">Etiqueta lingüística</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Criticidad">
+        <rdfs:subClassOf rdf:resource="#EtiquetaLinguistica"/>
+        <rdfs:label xml:lang="es">Criticidad</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#NivelAccesibilidad">
+        <rdfs:subClassOf rdf:resource="#EtiquetaLinguistica"/>
+        <rdfs:label xml:lang="es">Nivel de Accesibilidad</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#DecisionPriorizacion">
+        <rdfs:label xml:lang="es">Decisión de priorización</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#Recomendacion">
+        <rdfs:label xml:lang="es">Recomendación</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CriterioPriorizacion">
+        <rdfs:label xml:lang="es">Criterio de priorización</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CriterioLegitimo">
+        <rdfs:subClassOf rdf:resource="#CriterioPriorizacion"/>
+        <rdfs:label xml:lang="es">Criterio Legítimo</rdfs:label>
+    </owl:Class>
+
+    <owl:Class rdf:about="#CriterioExcluido">
+        <rdfs:subClassOf rdf:resource="#CriterioPriorizacion"/>
+        <rdfs:label xml:lang="es">Criterio Excluido</rdfs:label>
+    </owl:Class>
+
+    <!-- ======================================================== -->
+    <!-- OBJECT PROPERTIES                                        -->
+    <!-- ======================================================== -->
+
+    <owl:ObjectProperty rdf:about="#ubicadoEn">
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">ubicado en</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#cubreZona">
+        <rdfs:domain rdf:resource="#Ruta"/>
+        <rdfs:range rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">cubre zona</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#atiendePunto">
+        <rdfs:domain rdf:resource="#Ruta"/>
+        <rdfs:range rdf:resource="#PuntoAcopio"/>
+        <rdfs:label xml:lang="es">atiende punto</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#asignadaA">
+        <rdfs:domain rdf:resource="#Ruta"/>
+        <rdfs:range rdf:resource="#Vehiculo"/>
+        <rdfs:label xml:lang="es">asignada a</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#cercaDe">
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="#EquipamientoSensible"/>
+        <rdfs:label xml:lang="es">cerca de</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#reportadaEn">
+        <rdfs:domain rdf:resource="#QuejaCiudadana"/>
+        <rdfs:range rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">reportada en</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#consolidaEnNodo">
+        <rdfs:domain rdf:resource="#QuejaCiudadana"/>
+        <rdfs:range rdf:resource="#PuntoAcopio"/>
+        <rdfs:label xml:lang="es">consolida en nodo</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#afectaZona">
+        <rdfs:domain rdf:resource="#EventoClimatico"/>
+        <rdfs:range rdf:resource="#Zona"/>
+        <rdfs:label xml:lang="es">afecta zona</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#recibeTipo">
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="#TipoRAEE"/>
+        <rdfs:label xml:lang="es">recibe tipo</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#gestionadoPor">
+        <rdfs:domain rdf:resource="#PuntoAcopioRAEE"/>
+        <rdfs:range rdf:resource="#Gestor"/>
+        <rdfs:label xml:lang="es">gestionado por</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#tieneCriticidad">
+        <rdfs:range rdf:resource="#Criticidad"/>
+        <rdfs:label xml:lang="es">tiene criticidad</rdfs:label>
+    </owl:ObjectProperty>
+
+    <owl:ObjectProperty rdf:about="#tienePrioridad">
+        <rdfs:domain rdf:resource="#DecisionPriorizacion"/>
+        <rdfs:range rdf:resource="#Criticidad"/>
+        <rdfs:label xml:lang="es">tiene prioridad</rdfs:label>
+    </owl:ObjectProperty>
+
+    <!-- ======================================================== -->
+    <!-- DATA PROPERTIES                                          -->
+    <!-- ======================================================== -->
+
+    <owl:DatatypeProperty rdf:about="#nombre">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#hitoReferencia">
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#barriosAgrupados">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#porcentajeSaturacion">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label xml:lang="es">porcentaje saturación</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#saturacionOrdinarios">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#saturacionRAEE">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#PuntoAcopio"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#diasSinServicio">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+        <rdfs:label xml:lang="es">días sin servicio</rdfs:label>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#sensibilidadEntorno">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#demandaEsperada">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#capacidadRestantePct">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Vehiculo"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#latitud">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#longitud">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#poblacionVulnerable">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#porcentajeVulnerable">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Zona"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#decimal"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#severidad">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#integer"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#estadoVia">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#afectaPoblacionVulnerable">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#QuejaCiudadana"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#esPeligroso">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#TipoRAEE"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#disponible">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#estaAutorizado">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#Gestor"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#esLegitimo">
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdfs:domain rdf:resource="#CriterioPriorizacion"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
+    </owl:DatatypeProperty>
+
+    <owl:DatatypeProperty rdf:about="#descripcion">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+
+    <!-- ======================================================== -->
+    <!-- INDIVIDUALS (A-BOX · MANIZALES, CALDAS)                  -->
+    <!-- ======================================================== -->
+
+    <!-- ETIQUETAS LINGÜÍSTICAS -->
+    <owl:NamedIndividual rdf:about="#Criticidad_Baja">
+        <rdf:type rdf:resource="#Criticidad"/>
+    </owl:NamedIndividual>
+    <owl:NamedIndividual rdf:about="#Criticidad_Media">
+        <rdf:type rdf:resource="#Criticidad"/>
+    </owl:NamedIndividual>
+    <owl:NamedIndividual rdf:about="#Criticidad_Alta">
+        <rdf:type rdf:resource="#Criticidad"/>
+    </owl:NamedIndividual>
+    <owl:NamedIndividual rdf:about="#Criticidad_Critica">
+        <rdf:type rdf:resource="#Criticidad"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#NivelAccesibilidad_Buena">
+        <rdf:type rdf:resource="#NivelAccesibilidad"/>
+    </owl:NamedIndividual>
+    <owl:NamedIndividual rdf:about="#NivelAccesibilidad_Regular">
+        <rdf:type rdf:resource="#NivelAccesibilidad"/>
+    </owl:NamedIndividual>
+    <owl:NamedIndividual rdf:about="#NivelAccesibilidad_Mala">
+        <rdf:type rdf:resource="#NivelAccesibilidad"/>
+    </owl:NamedIndividual>
+
+    <!-- GESTORES EN MANIZALES -->
+    <owl:NamedIndividual rdf:about="#Gestor_EMAS_Manizales">
+        <rdf:type rdf:resource="#GestorAutorizado"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">EMAS by Veolia Manizales</nombre>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <estaAutorizado rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</estaAutorizado>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Gestor_EcoCaldas_RAEE">
+        <rdf:type rdf:resource="#GestorAutorizado"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">EcoCaldas Gestor Autorizado RAEE</nombre>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <estaAutorizado rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</estaAutorizado>
+    </owl:NamedIndividual>
+
+    <!-- ZONAS DE MANIZALES, CALDAS (COMUNAS, VEREDAS Y CORREGIMIENTOS) -->
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Cumanday_Centro">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Cumanday · Centro Histórico</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Plaza de Bolívar</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Centro, Los Agustinos, San José, Fundadores, Parque Caldas</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06889</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.51738</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">88</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">820</demandaEsperada>
+        <poblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3200</poblacionVulnerable>
+        <porcentajeVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">28.5</porcentajeVulnerable>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Cerro_De_Oro">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Ecoturístico Cerro de Oro · Eje Comercial</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mall Plaza</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Carola, Los Cámbulos, Villahermosa, Alta Suiza, San Marcel, La Sultana</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06941</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48322</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">84</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">790</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Palogrande">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Palogrande · Zona Rosa y Universitaria</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Torre del Cable</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">El Cable, Palogrande, La Estrella, Belén, Palermo, La Rambla</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.05612</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48784</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">91</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">750</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Tesorito_Industrial">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Tesorito · Corredor Industrial</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Parque Industrial Maltería</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Maltería, Juanchito, La Enea, Lusitania, San Pío X</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.03918</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.44215</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">76</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">680</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Atardeceres_Chipre">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Atardeceres · Sector Occidental</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mirador de Chipre</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Chipre, Villa Pilar, Sacatín, La Francia, Campohermoso</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.07524</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.52951</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">74</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">540</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Ciudadela_Del_Norte">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Ciudadela del Norte</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cisco Bosques del Norte</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bosques del Norte, San Cayetano, Solferino, Sinaí, Caribe</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.08847</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49852</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">640</demandaEsperada>
+        <poblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4800</poblacionVulnerable>
+        <porcentajeVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">34.2</porcentajeVulnerable>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_San_Jose_Galeria">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna San José · Sector Abastecimiento</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Plaza de Mercado Galería</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Galería, Colón, Las Delicias, Assis, San Ignacio</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.07352</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.52105</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">89</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">860</demandaEsperada>
+        <poblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4100</poblacionVulnerable>
+        <porcentajeVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">36.0</porcentajeVulnerable>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_Universitaria_Fatima">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna Universitaria · Sur Urbano</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Redoma Fátima</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Fátima, Pío XII, Aranjuez, Malabar, Kennedy, Camilo Torres</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.05108</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49954</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">72</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">590</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Comuna_La_Fuente_Milan">
+        <rdf:type rdf:resource="#ComunaUrbana"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Comuna La Fuente · Zona Gastronómica Suroriental</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bulevar de Milán</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Milán, El Paraíso, La Fuente, Guamal, Bengala</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.04853</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.47651</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">69</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">480</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Vereda_La_Cabana">
+        <rdf:type rdf:resource="#Vereda"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vereda La Cabaña</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Centro Poblado La Cabaña</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Cabaña, Cuchilla del Salado, Las Pavas, La Linda Rural</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.09804</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.58812</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">70</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">9</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">145</demandaEsperada>
+        <poblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">310</poblacionVulnerable>
+        <porcentajeVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">29.4</porcentajeVulnerable>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Vereda_El_Rosario">
+        <rdf:type rdf:resource="#Vereda"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vereda El Rosario</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Crucero El Rosario</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">El Rosario, La Violeta, Trinidad, Santa Clara</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.03812</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.54508</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">66</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">130</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Vereda_Alto_Del_Guamo">
+        <rdf:type rdf:resource="#Vereda"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vereda Alto del Guamo</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Alto del Guamo</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Alto del Guamo, El Águila, Alto del Naranjo, Quiebra de Vélez</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.11905</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49206</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">75</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">120</demandaEsperada>
+        <poblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">290</poblacionVulnerable>
+        <porcentajeVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">31.5</porcentajeVulnerable>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Corregimiento_Rio_Blanco">
+        <rdf:type rdf:resource="#Corregimiento"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Corregimiento Río Blanco</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reserva Protectora Río Blanco</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Río Blanco, Minitas, La Aurora, Buenavista</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.07809</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.46104</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">96</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">110</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Zona_Vereda_Bajo_Tablazo">
+        <rdf:type rdf:resource="#Vereda"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Vereda Bajo Tablazo</nombre>
+        <hitoReferencia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cruce Bajo Tablazo</hitoReferencia>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bajo Tablazo, Alto Tablazo, Java, La Pola</barriosAgrupados>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.04485</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.53421</longitud>
+        <sensibilidadEntorno rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</sensibilidadEntorno>
+        <diasSinServicio rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</diasSinServicio>
+        <demandaEsperada rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">125</demandaEsperada>
+    </owl:NamedIndividual>
+
+    <!-- EQUIPAMIENTO SENSIBLE EN MANIZALES -->
+    <owl:NamedIndividual rdf:about="#Hospital_Infantil_Manizales">
+        <rdf:type rdf:resource="#CentroSalud"/>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Palogrande"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Instituto_Universitario_Caldas">
+        <rdf:type rdf:resource="#Colegio"/>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Cumanday_Centro"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Cuenca_Hidrica_Rio_Blanco">
+        <rdf:type rdf:resource="#ReservaAmbiental"/>
+        <ubicadoEn rdf:resource="#Zona_Corregimiento_Rio_Blanco"/>
+    </owl:NamedIndividual>
+
+    <!-- TIPOS DE RAEE -->
+    <owl:NamedIndividual rdf:about="#RAEE_Baterias">
+        <rdf:type rdf:resource="#TipoRAEEPeligroso"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Celulares">
+        <rdf:type rdf:resource="#TipoRAEE"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Computadores">
+        <rdf:type rdf:resource="#TipoRAEE"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Electrodomesticos">
+        <rdf:type rdf:resource="#TipoRAEE"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Cables">
+        <rdf:type rdf:resource="#TipoRAEE"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Tarjetas">
+        <rdf:type rdf:resource="#TipoRAEEPeligroso"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esPeligroso>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#RAEE_Bombillas">
+        <rdf:type rdf:resource="#TipoRAEEPeligroso"/>
+        <esPeligroso rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esPeligroso>
+    </owl:NamedIndividual>
+
+    <!-- NODOS DE ACOPIO (HITOS DE REFERENCIA EN MANIZALES) -->
+    <owl:NamedIndividual rdf:about="#Nodo_Mall_Plaza">
+        <rdf:type rdf:resource="#PuntoAcopioRAEE"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mall Plaza</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Carola, Los Cámbulos, Villahermosa, Alta Suiza</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Cerro_De_Oro"/>
+        <gestionadoPor rdf:resource="#Gestor_EcoCaldas_RAEE"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06941</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48322</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">68</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Celulares"/>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Cables"/>
+        <recibeTipo rdf:resource="#RAEE_Computadores"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Plaza_De_Bolivar">
+        <rdf:type rdf:resource="#PuntoAcopioRAEE"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Plaza de Bolívar</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Centro, Los Agustinos, Parque Caldas</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Cumanday_Centro"/>
+        <cercaDe rdf:resource="#Instituto_Universitario_Caldas"/>
+        <gestionadoPor rdf:resource="#Gestor_EMAS_Manizales"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06889</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.51738</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">86</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">86</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">62</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Celulares"/>
+        <recibeTipo rdf:resource="#RAEE_Bombillas"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Torre_Del_Cable">
+        <rdf:type rdf:resource="#PuntoAcopioRAEE"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Torre del Cable</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">El Cable, La Estrella, Belén, La Rambla</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Palogrande"/>
+        <cercaDe rdf:resource="#Hospital_Infantil_Manizales"/>
+        <gestionadoPor rdf:resource="#Gestor_EcoCaldas_RAEE"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.05612</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48784</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">81</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">74</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Computadores"/>
+        <recibeTipo rdf:resource="#RAEE_Celulares"/>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Plaza_Mercado_Galeria">
+        <rdf:type rdf:resource="#ContenedorOrdinario"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Plaza de Mercado Galería</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Galería, Colón, Las Delicias, San José</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_San_Jose_Galeria"/>
+        <cercaDe rdf:resource="#Instituto_Universitario_Caldas"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.07352</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.52105</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">92</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">92</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">41</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Electrodomesticos"/>
+        <recibeTipo rdf:resource="#RAEE_Cables"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Parque_Industrial_Malteria">
+        <rdf:type rdf:resource="#PuntoAcopioRAEE"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Parque Industrial Maltería</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Maltería, Juanchito, Zona Franca Andina</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Tesorito_Industrial"/>
+        <gestionadoPor rdf:resource="#Gestor_EcoCaldas_RAEE"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.03918</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.44215</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">63</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">89</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">89</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Tarjetas"/>
+        <recibeTipo rdf:resource="#RAEE_Cables"/>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Cisco_Bosques_Del_Norte">
+        <rdf:type rdf:resource="#ContenedorOrdinario"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cisco Bosques del Norte</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Bosques del Norte, San Cayetano, Solferino, Sinaí, Caribe</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Comuna_Ciudadela_Del_Norte"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.08847</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49852</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">83</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">83</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">58</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Electrodomesticos"/>
+        <recibeTipo rdf:resource="#RAEE_Cables"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Centro_Poblado_La_Cabana">
+        <rdf:type rdf:resource="#ContenedorOrdinario"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Centro Poblado La Cabaña</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">La Cabaña, Cuchilla del Salado, Las Pavas</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Vereda_La_Cabana"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.09804</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.58812</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">76</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">76</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">39</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Bombillas"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Crucero_El_Rosario">
+        <rdf:type rdf:resource="#ContenedorOrdinario"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Crucero El Rosario</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">El Rosario, La Violeta, Trinidad</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Vereda_El_Rosario"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.03812</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.54508</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">68</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">68</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">34</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Bombillas"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Alto_Del_Guamo">
+        <rdf:type rdf:resource="#ContenedorOrdinario"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Alto del Guamo</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Alto del Guamo, El Águila, Alto del Naranjo</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Vereda_Alto_Del_Guamo"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.11905</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49206</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">79</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">79</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">42</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Bombillas"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Nodo_Reserva_Rio_Blanco">
+        <rdf:type rdf:resource="#PuntoAcopioRAEE"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reserva Protectora Río Blanco</nombre>
+        <barriosAgrupados rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Río Blanco, Minitas, La Aurora</barriosAgrupados>
+        <ubicadoEn rdf:resource="#Zona_Corregimiento_Rio_Blanco"/>
+        <cercaDe rdf:resource="#Cuenca_Hidrica_Rio_Blanco"/>
+        <gestionadoPor rdf:resource="#Gestor_EcoCaldas_RAEE"/>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.07809</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.46104</longitud>
+        <saturacionOrdinarios rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</saturacionOrdinarios>
+        <porcentajeSaturacion rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</porcentajeSaturacion>
+        <saturacionRAEE rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">53</saturacionRAEE>
+        <recibeTipo rdf:resource="#RAEE_Baterias"/>
+        <recibeTipo rdf:resource="#RAEE_Bombillas"/>
+    </owl:NamedIndividual>
+
+    <!-- VEHÍCULOS DE LA FLOTA DE MANIZALES -->
+    <owl:NamedIndividual rdf:about="#Vehiculo_Compactador_EMAS_01">
+        <rdf:type rdf:resource="#CamionCompactador"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Compactador EMAS-01</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06810</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48510</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Compactador_EMAS_02">
+        <rdf:type rdf:resource="#CamionCompactador"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Compactador EMAS-02</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">75</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.06820</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.51240</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Compactador_EMAS_03">
+        <rdf:type rdf:resource="#CamionCompactador"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Compactador EMAS-03</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">68</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.05690</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.48890</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Compactador_EMAS_04">
+        <rdf:type rdf:resource="#CamionCompactador"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Compactador EMAS-04</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">0</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.03610</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.45510</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Volqueta_VV_05">
+        <rdf:type rdf:resource="#Volqueta"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Volqueta Veredal VV-05</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">85</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.08450</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.55120</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Volqueta_VV_06">
+        <rdf:type rdf:resource="#Volqueta"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Volqueta Veredal VV-06</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">78</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.09820</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.49510</longitud>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Vehiculo_Gestor_RAEE_EcoCaldas_08">
+        <rdf:type rdf:resource="#Vehiculo"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gestor RAEE EcoCaldas-08</nombre>
+        <capacidadRestantePct rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">92</capacidadRestantePct>
+        <disponible rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</disponible>
+        <latitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">5.04150</latitud>
+        <longitud rdf:datatype="http://www.w3.org/2001/XMLSchema#decimal">-75.44820</longitud>
+    </owl:NamedIndividual>
+
+    <!-- EVENTOS CLIMÁTICOS Y QUEJAS CIUDADANAS EN MANIZALES -->
+    <owl:NamedIndividual rdf:about="#Queja_La_Carola_Mall_Plaza">
+        <rdf:type rdf:resource="#QuejaCiudadana"/>
+        <reportadaEn rdf:resource="#Zona_Comuna_Cerro_De_Oro"/>
+        <consolidaEnNodo rdf:resource="#Nodo_Mall_Plaza"/>
+        <severidad rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</severidad>
+        <afectaPoblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</afectaPoblacionVulnerable>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reporte en barrio La Carola por acumulación de residuos posconsumo; consolidado en nodo Mall Plaza.</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Queja_Malteria_Quema_Cables">
+        <rdf:type rdf:resource="#QuejaCiudadana"/>
+        <reportadaEn rdf:resource="#Zona_Comuna_Tesorito_Industrial"/>
+        <consolidaEnNodo rdf:resource="#Nodo_Parque_Industrial_Malteria"/>
+        <severidad rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</severidad>
+        <afectaPoblacionVulnerable rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</afectaPoblacionVulnerable>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Alerta ambiental por quema informal de cables y descarte de tarjetas electrónicas en Maltería.</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#EventoClimatico_Alto_Del_Guamo">
+        <rdf:type rdf:resource="#Deslizamiento"/>
+        <afectaZona rdf:resource="#Zona_Vereda_Alto_Del_Guamo"/>
+        <severidad rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</severidad>
+        <estadoVia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Mala</estadoVia>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Deslizamiento de tierra y pérdida parcial de banca por lluvias intensas en corredor rural hacia Alto del Guamo.</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#EventoClimatico_La_Cabana">
+        <rdf:type rdf:resource="#Lluvia"/>
+        <afectaZona rdf:resource="#Zona_Vereda_La_Cabana"/>
+        <severidad rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</severidad>
+        <estadoVia rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Regular</estadoVia>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Precipitaciones continuas en ladera occidental hacia La Cabaña; calzada húmeda con paso restringido a volqueta.</descripcion>
+    </owl:NamedIndividual>
+
+    <!-- RUTAS OPERATIVAS DE MANIZALES -->
+    <owl:NamedIndividual rdf:about="#Ruta_Troncal_Urbana_Manizales_01">
+        <rdf:type rdf:resource="#Ruta"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ruta Troncal Urbana · Eje Kevin Ángel y Centro</nombre>
+        <asignadaA rdf:resource="#Vehiculo_Compactador_EMAS_01"/>
+        <atiendePunto rdf:resource="#Nodo_Plaza_Mercado_Galeria"/>
+        <atiendePunto rdf:resource="#Nodo_Plaza_De_Bolivar"/>
+        <atiendePunto rdf:resource="#Nodo_Cisco_Bosques_Del_Norte"/>
+        <atiendePunto rdf:resource="#Nodo_Mall_Plaza"/>
+        <cubreZona rdf:resource="#Zona_Comuna_San_Jose_Galeria"/>
+        <cubreZona rdf:resource="#Zona_Comuna_Cumanday_Centro"/>
+        <cubreZona rdf:resource="#Zona_Comuna_Cerro_De_Oro"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Ruta_Equidad_Rural_Manizales_02">
+        <rdf:type rdf:resource="#Ruta"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ruta Equidad Rural · Veredas de Manizales</nombre>
+        <asignadaA rdf:resource="#Vehiculo_Volqueta_VV_06"/>
+        <atiendePunto rdf:resource="#Nodo_Alto_Del_Guamo"/>
+        <atiendePunto rdf:resource="#Nodo_Centro_Poblado_La_Cabana"/>
+        <atiendePunto rdf:resource="#Nodo_Crucero_El_Rosario"/>
+        <cubreZona rdf:resource="#Zona_Vereda_Alto_Del_Guamo"/>
+        <cubreZona rdf:resource="#Zona_Vereda_La_Cabana"/>
+        <cubreZona rdf:resource="#Zona_Vereda_El_Rosario"/>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Ruta_Especial_RAEE_Manizales_03">
+        <rdf:type rdf:resource="#Ruta"/>
+        <nombre rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Ruta Especializada RAEE · Circuito Metropolitano Manizales</nombre>
+        <asignadaA rdf:resource="#Vehiculo_Gestor_RAEE_EcoCaldas_08"/>
+        <atiendePunto rdf:resource="#Nodo_Parque_Industrial_Malteria"/>
+        <atiendePunto rdf:resource="#Nodo_Torre_Del_Cable"/>
+        <atiendePunto rdf:resource="#Nodo_Mall_Plaza"/>
+        <atiendePunto rdf:resource="#Nodo_Plaza_De_Bolivar"/>
+        <atiendePunto rdf:resource="#Nodo_Reserva_Rio_Blanco"/>
+    </owl:NamedIndividual>
+
+    <!-- CRITERIOS ÉTICOS (FILTRADO) -->
+    <owl:NamedIndividual rdf:about="#Criterio_Saturacion">
+        <rdf:type rdf:resource="#CriterioLegitimo"/>
+        <esLegitimo rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esLegitimo>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Nivel de llenado o rebosamiento de contenedores</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Criterio_SensibilidadEntorno">
+        <rdf:type rdf:resource="#CriterioLegitimo"/>
+        <esLegitimo rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esLegitimo>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Cercanía a colegios, centros de salud o fuentes de agua en Manizales</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Criterio_DiasSinServicio">
+        <rdf:type rdf:resource="#CriterioLegitimo"/>
+        <esLegitimo rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</esLegitimo>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Días acumulados sin atención para garantizar equidad territorial en veredas</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Criterio_RelacionesPersonales">
+        <rdf:type rdf:resource="#CriterioExcluido"/>
+        <esLegitimo rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</esLegitimo>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Favoritismo por conocidos del operario (excluido por sesgo)</descripcion>
+    </owl:NamedIndividual>
+
+    <owl:NamedIndividual rdf:about="#Criterio_PresionPolitica">
+        <rdf:type rdf:resource="#CriterioExcluido"/>
+        <esLegitimo rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</esLegitimo>
+        <descripcion rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Priorización por visibilidad mediática o eventos políticos (excluido por sesgo)</descripcion>
+    </owl:NamedIndividual>
+
+</rdf:RDF>

@@ -1,0 +1,23 @@
+{
+  "name": "villa-verde-smart",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prototipo académico para priorización explicable de residuos en Villa Verde",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:up": "docker compose up -d mongo",
+    "db:down": "docker compose stop mongo",
+    "seed": "node src/seed.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.9.5"
+  }
+}
