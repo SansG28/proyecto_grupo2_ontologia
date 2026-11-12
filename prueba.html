@@ -321,24 +321,69 @@
                             </div>
                             <input id="days-slider" type="range" min="0" max="15" value="2" class="w-full accent-cyan-500 bg-gray-800 h-2 rounded-lg appearance-none cursor-pointer">
                             <div class="flex justify-between text-[10px] text-gray-500 mt-1">
-                                <span>0 d (Al día)</span>
-                                <span>5 d (Varios)</span>
-                                <span>10+ d (Desatendida)</span>
+                                <span>0 d (Bajo)</span>
+                                <span>5 d (Medio)</span>
+                                <span>10+ d (Alto)</span>
                             </div>
+                        </div>
+
+                        <!-- Capacidad Restante del Vehículo -->
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <label for="capacity-slider" class="text-gray-300 font-medium">Capacidad Restante Camión (<code>capacidadRestantePct</code>)</label>
+                                <span id="capacity-value" class="text-emerald-400 font-bold">82% (Alta)</span>
+                            </div>
+                            <input id="capacity-slider" type="range" min="0" max="100" value="82" class="w-full accent-emerald-500 bg-gray-800 h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                <span>0% Baja</span>
+                                <span>50% Media</span>
+                                <span>100% Alta</span>
+                            </div>
+                        </div>
+
+                        <!-- Volumen RAEE -->
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800">
+                            <div class="flex justify-between text-xs mb-1.5">
+                                <label for="raee-volume-slider" class="text-gray-300 font-medium">Volumen RAEE (<code>NivelVolumenRAEE</code>)</label>
+                                <span id="raee-volume-value" class="text-purple-400 font-bold">68% (Alto)</span>
+                            </div>
+                            <input id="raee-volume-slider" type="range" min="0" max="100" value="68" class="w-full accent-purple-500 bg-gray-800 h-2 rounded-lg appearance-none cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+                                <span>0% Bajo</span>
+                                <span>50% Medio</span>
+                                <span>80%+ Alto</span>
+                            </div>
+                        </div>
+
+                        <!-- Banderas Ontológicas Booleanas -->
+                        <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800 space-y-2 text-xs">
+                            <div class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1">Condiciones Ontológicas</div>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-gray-300">Entorno Sensible (<code>PuntoEnEntornoSensible</code>)</span>
+                                <input id="sensitive-env-toggle" type="checkbox" checked class="accent-cyan-500 w-4 h-4">
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-gray-300">Gestor RAEE Disponible (<code>GestorDisponible</code>)</span>
+                                <input id="gestor-available-toggle" type="checkbox" checked class="accent-emerald-500 w-4 h-4">
+                            </label>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <span class="text-gray-300">RAEE Peligroso (<code>TipoRAEE_EsPeligroso</code>)</span>
+                                <input id="raee-dangerous-toggle" type="checkbox" checked class="accent-amber-500 w-4 h-4">
+                            </label>
                         </div>
                     </div>
 
                     <button id="run-inference" type="button" class="w-full mt-5 py-2.5 rounded-xl bg-emerald-600 font-bold text-xs text-white hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-500/20">
-                        <i class="fa-solid fa-gears mr-1.5"></i>Ejecutar Motor Mamdani y Actualizar Ruta
+                        <i class="fa-solid fa-gears mr-1.5"></i>Ejecutar Motor Mamdani (R1–R32) y Actualizar Ruta
                     </button>
                     <p id="inference-status" class="text-[10px] text-emerald-400 mt-2 text-center" role="status"></p>
                 </div>
 
                 <!-- 2. Base de Reglas SI-ENTONCES -->
                 <div class="glass-card glass-card-hover p-5 rounded-2xl border-t-4 border-t-purple-500 flex flex-col">
-                    <h3 class="text-sm font-bold text-white mb-3"><i class="fa-solid fa-code-branch text-purple-400 mr-1.5"></i>2. Reglas Activadas (Base de Conocimiento)</h3>
-                    <div id="membership-summary" class="grid grid-cols-3 gap-2 mb-3 text-[10px] font-mono"></div>
-                    <div id="activated-rules" class="space-y-3 text-[11px] font-mono flex-grow overflow-y-auto max-h-80 pr-1" aria-live="polite"></div>
+                    <h3 class="text-sm font-bold text-white mb-3"><i class="fa-solid fa-code-branch text-purple-400 mr-1.5"></i>2. Reglas Activadas (Bloques 1 y 2 · R1–R32)</h3>
+                    <div id="membership-summary" class="grid grid-cols-2 gap-2 mb-3 text-[10px] font-mono"></div>
+                    <div id="activated-rules" class="space-y-3 text-[11px] font-mono flex-grow overflow-y-auto max-h-96 pr-1" aria-live="polite"></div>
                 </div>
 
                 <!-- 3. Salida y Explicabilidad -->
@@ -347,10 +392,20 @@
 
                     <div class="flex-grow flex flex-col justify-center items-center p-5 bg-gray-900/60 rounded-2xl border border-gray-800 mb-4 relative overflow-hidden">
                         <div class="absolute -top-10 -right-10 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl"></div>
-                        <span class="text-xs text-gray-400 uppercase tracking-wider mb-1">Nivel de Prioridad de Ruta</span>
+                        <span class="text-xs text-gray-400 uppercase tracking-wider mb-1">Centroide Global (R1–R32)</span>
                         <span id="priority-score" class="text-4xl font-extrabold text-red-400 drop-shadow-md">63.7%</span>
                         <span id="priority-label" class="px-3.5 py-1 mt-2 text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded-full">Atención Alta</span>
-                        <div id="route-rank-badge" class="mt-3 px-3 py-1 rounded-lg bg-cyan-950/70 border border-cyan-500/30 text-[11px] text-cyan-300 font-semibold"></div>
+                        <div class="grid grid-cols-2 gap-2 w-full mt-3 text-[10px]">
+                            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800 text-center">
+                                <div class="text-gray-400">Sanitaria (Bloque 1)</div>
+                                <div id="sanitary-criticality-badge" class="font-bold text-cyan-300 mt-0.5">Criticidad_Alta</div>
+                            </div>
+                            <div class="p-2 rounded-lg bg-gray-950/80 border border-gray-800 text-center">
+                                <div class="text-gray-400">Operativa (Bloque 2)</div>
+                                <div id="operational-criticality-badge" class="font-bold text-amber-300 mt-0.5">Criticidad_Alta</div>
+                            </div>
+                        </div>
+                        <div id="route-rank-badge" class="mt-3 px-3 py-1 rounded-lg bg-cyan-950/70 border border-cyan-500/30 text-[11px] text-cyan-300 font-semibold text-center"></div>
                     </div>
 
                     <div class="bg-gray-950 p-3.5 rounded-xl font-mono text-[10px] text-gray-300 border border-gray-800 space-y-2">
@@ -358,6 +413,7 @@
                             <span class="text-emerald-400 font-bold">&gt;&gt; TRAZA DE EXPLICABILIDAD:</span><br>
                             <span id="explanation" class="leading-relaxed"></span>
                         </div>
+                        <div id="operational-action-box" class="pt-2 border-t border-gray-800 text-amber-300 hidden"></div>
                         <div class="pt-2 border-t border-gray-800 flex justify-between items-center">
                             <span class="text-cyan-400 font-bold">&gt;&gt; UNIDAD ASIGNADA:</span>
                             <span id="recommended-vehicle" class="px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">Compactador</span>
@@ -495,6 +551,7 @@
     </main>
 
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js"></script>
+    <script src="src/fuzzy.js"></script>
     <script src="src/client.js"></script>
 </body>
 </html>

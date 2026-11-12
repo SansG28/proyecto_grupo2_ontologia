@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {
+  RULE_DEFINITIONS,
   fuzzyPriority,
   deriveScenarioContext,
 } = require('../src/fuzzy');
@@ -115,10 +116,18 @@ test('4. Motor difuso evalúa casos extremos: máxima urgencia vs. vía bloquead
   });
 
   assert.equal(regularCase.priority, 'Baja');
+  assert.equal(regularCase.criticidad, 'Criticidad_Baja');
+  assert.ok(regularCase.activatedRules.some((rule) => rule.id === 'R3'));
+  assert.ok(regularCase.activatedRules.some((rule) => rule.id === 'R15'));
+  assert.ok(regularCase.activatedRules.some((rule) => rule.id === 'R23'));
+
   assert.equal(criticalCase.priority, 'Inmediata');
+  assert.equal(criticalCase.criticidad, 'Criticidad_Critica');
   assert.ok(criticalCase.score > regularCase.score);
-  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R01'));
-  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R10'));
+  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R1'));
+  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R4'));
+  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R8'));
+  assert.ok(criticalCase.activatedRules.some((rule) => rule.id === 'R16'));
 
   // Caso extremo: Vía bloqueada por derrumbe en Alto del Guamo + saturación alta
   const guamoEvents = contextEvents
@@ -132,11 +141,15 @@ test('4. Motor difuso evalúa casos extremos: máxima urgencia vs. vía bloquead
     sensitivity: guamoContext.sensitivity,
     daysWithoutService: 10,
     accessibility: guamoContext.accessibility,
+    puntoEnEntornoSensible: guamoContext.puntoEnEntornoSensible,
   });
 
-  assert.equal(blockedRoadEvaluation.priority, 'Inmediata');
+  // Separación Bloque 1 (Criticidad Sanitaria) vs Bloque 2 (Restricción Vial / Volqueta)
+  assert.equal(blockedRoadEvaluation.sanitaryPriority, 'Inmediata');
+  assert.equal(blockedRoadEvaluation.sanitaryCriticidad, 'Criticidad_Critica');
   assert.equal(blockedRoadEvaluation.recommendedVehicleType, 'Volqueta');
-  assert.ok(blockedRoadEvaluation.activatedRules.some((rule) => rule.id === 'R09'));
+  assert.ok(blockedRoadEvaluation.activatedRules.some((rule) => rule.id === 'R17'));
+  assert.ok(blockedRoadEvaluation.activatedRules.some((rule) => rule.id === 'R28'));
   assert.match(blockedRoadEvaluation.accessibilityAdvice, /no elimina la prioridad sanitaria/);
 });
 
@@ -196,4 +209,180 @@ test('6. Ontología ontology/villa_verde_v3.owl está poblada con Manizales y li
   assert.ok(meta.individuals.includes('Zona_Vereda_La_Cabana'), 'Debe incluir el individuo #Zona_Vereda_La_Cabana');
   assert.ok(meta.individuals.includes('Zona_Vereda_Alto_Del_Guamo'), 'Debe incluir el individuo #Zona_Vereda_Alto_Del_Guamo');
   assert.ok(meta.individuals.includes('Queja_La_Carola_Mall_Plaza'), 'Debe incluir la queja de La Carola consolidada en Mall Plaza');
+  assert.ok(meta.classes.includes('NivelVolumenRAEE'), 'Debe incluir la clase #NivelVolumenRAEE');
+  assert.ok(meta.individuals.includes('NivelVolumenRAEE_Alto'), 'Debe incluir el individuo #NivelVolumenRAEE_Alto');
+  assert.ok(meta.datatypeProperties.includes('volumenRAEEkg'), 'Debe incluir la propiedad #volumenRAEEkg');
+});
+
+test('7. Bloque 1 completo (R1–R15): saturación, días sin servicio y entorno sensible', () => {
+  assert.equal(RULE_DEFINITIONS.length, 32, 'El motor debe contener exactamente las 32 reglas (R1–R32)');
+
+  const hasRule = (res, id) => res.activatedRules.some((r) => r.id === id);
+
+  // Media + Entorno Sensible true -> R2 (Alta) vs Media + Entorno Sensible false -> R11 (Baja)
+  const medSens = fuzzyPriority({ saturation: 52, daysWithoutService: 1, puntoEnEntornoSensible: true });
+  const medNoSens = fuzzyPriority({ saturation: 52, daysWithoutService: 1, puntoEnEntornoSensible: false });
+  assert.ok(hasRule(medSens, 'R2'));
+  assert.ok(hasRule(medSens, 'R6'));
+  assert.ok(hasRule(medNoSens, 'R11'));
+  assert.ok(medSens.sanitaryScore > medNoSens.sanitaryScore);
+
+  // Baja + Entorno Sensible true -> R7 (Media), Días Medio + Sensible -> R5 (Alta), Baja + Días Medio -> R13 (Media)
+  const lowMedDaysSens = fuzzyPriority({ saturation: 15, daysWithoutService: 5, puntoEnEntornoSensible: true });
+  assert.ok(hasRule(lowMedDaysSens, 'R5'));
+  assert.ok(hasRule(lowMedDaysSens, 'R7'));
+  assert.ok(hasRule(lowMedDaysSens, 'R13'));
+
+  // Alta + Días Medio -> R9 (Alta), Media + Días Alto -> R10 (Alta), Alta + No Sensible -> R14 (Alta), Días Alto + No Sensible -> R12 (Media)
+  const highMedNoSens = fuzzyPriority({ saturation: 90, daysWithoutService: 5, puntoEnEntornoSensible: false });
+  assert.ok(hasRule(highMedNoSens, 'R9'));
+  assert.ok(hasRule(highMedNoSens, 'R14'));
+
+  const medHighDaysNoSens = fuzzyPriority({ saturation: 52, daysWithoutService: 11, puntoEnEntornoSensible: false });
+  assert.ok(hasRule(medHighDaysNoSens, 'R10'));
+  assert.ok(hasRule(medHighDaysNoSens, 'R12'));
+});
+
+test('8. Bloque 2 Logístico (R16–R19, R22–R25, R28–R29, R31): accesibilidad vial y capacidad de flota', () => {
+  const hasRule = (res, id) => res.activatedRules.some((r) => r.id === id);
+
+  // R18: Días Alto + Buena + Capacidad Alta -> Criticidad_Alta
+  const eqHighCap = fuzzyPriority({
+    saturation: 20,
+    daysWithoutService: 12,
+    accessibility: 'Buena',
+    capacidadRestantePct: 90,
+    puntoEnEntornoSensible: false,
+  });
+  assert.ok(hasRule(eqHighCap, 'R18'));
+  assert.ok(hasRule(eqHighCap, 'R23'));
+
+  // R19 y R22: Saturación Media + Regular + Capacidad Baja -> aplazamiento por capacidad
+  const lowCapMed = fuzzyPriority({
+    saturation: 52,
+    daysWithoutService: 2,
+    accessibility: 'Regular',
+    capacidadRestantePct: 15,
+    puntoEnEntornoSensible: false,
+  });
+  assert.ok(hasRule(lowCapMed, 'R19'));
+  assert.ok(hasRule(lowCapMed, 'R22'));
+  assert.ok(lowCapMed.operationalActions.some((a) => a.tag === 'aplazar_capacidad_camion'));
+
+  // R24: Saturación Alta + Regular
+  const highRegular = fuzzyPriority({ saturation: 88, daysWithoutService: 2, accessibility: 'Regular' });
+  assert.ok(hasRule(highRegular, 'R24'));
+
+  // R25, R29, R31: Vía Mala + Capacidad Baja + Saturación baja/media -> regreso a base por seguridad y capacidad
+  const badRoadLowCap = fuzzyPriority({
+    saturation: 35,
+    daysWithoutService: 2,
+    accessibility: 'Mala',
+    capacidadRestantePct: 15,
+    puntoEnEntornoSensible: false,
+  });
+  assert.ok(hasRule(badRoadLowCap, 'R25'));
+  assert.ok(hasRule(badRoadLowCap, 'R29'));
+  assert.ok(hasRule(badRoadLowCap, 'R31'));
+  assert.ok(badRoadLowCap.operationalActions.some((a) => a.tag === 'regreso_base_seguridad_capacidad'));
+});
+
+test('9. Bloque 2 RAEE (R20–R21, R26–R27, R30, R32): gestor disponible y residuos peligrosos', () => {
+  const hasRule = (res, id) => res.activatedRules.some((r) => r.id === id);
+
+  // R20 y R32: Volumen RAEE Alto + Peligroso + Gestor disponible -> jornada especial crítica
+  const raeeEmergency = fuzzyPriority({
+    saturation: 50,
+    daysWithoutService: 2,
+    accessibility: 'Buena',
+    volumenRaee: 90,
+    gestorDisponible: true,
+    tipoRaeeEsPeligroso: true,
+    puntoEnEntornoSensible: true,
+  });
+  assert.ok(hasRule(raeeEmergency, 'R20'));
+  assert.ok(hasRule(raeeEmergency, 'R32'));
+  assert.equal(raeeEmergency.recommendedVehicleType, 'RAEE_Especial');
+  assert.ok(raeeEmergency.operationalActions.some((a) => a.tag === 'prioridad_maxima_raee_peligroso'));
+
+  // R26: Volumen RAEE Alto + Gestor NO disponible -> almacenamiento temporal
+  const raeeNoManagerHigh = fuzzyPriority({
+    saturation: 40,
+    daysWithoutService: 2,
+    accessibility: 'Buena',
+    volumenRaee: 90,
+    gestorDisponible: false,
+    tipoRaeeEsPeligroso: true,
+  });
+  assert.ok(hasRule(raeeNoManagerHigh, 'R26'));
+  assert.ok(raeeNoManagerHigh.operationalActions.some((a) => a.tag === 'almacenamiento_temporal_punto_fijo'));
+
+  // R21 vs R27: Volumen RAEE Medio con/sin gestor
+  const raeeMedNoManager = fuzzyPriority({ saturation: 30, daysWithoutService: 1, volumenRaee: 50, gestorDisponible: false });
+  const raeeMedManager = fuzzyPriority({ saturation: 30, daysWithoutService: 1, volumenRaee: 50, gestorDisponible: true });
+  assert.ok(hasRule(raeeMedNoManager, 'R21'));
+  assert.ok(hasRule(raeeMedManager, 'R27'));
+
+  // R30: Volumen RAEE Bajo + Gestor disponible
+  const raeeLow = fuzzyPriority({ saturation: 20, daysWithoutService: 1, volumenRaee: 15, gestorDisponible: true });
+  assert.ok(hasRule(raeeLow, 'R30'));
+});
+
+test('10. Integración API /api/inferencia/evaluar con variables operativas y RAEE de Bloque 2', async () => {
+  resetOperationalStore();
+  const territory = await getMapData();
+  const malteria = territory.puntos.find((p) => p.nombre === 'Parque Industrial Maltería');
+  const gestorRaee = territory.vehiculos.find((v) => v.identificador === 'Gestor RAEE EcoCaldas-08');
+  assert.ok(malteria);
+  assert.ok(gestorRaee);
+
+  const res = await invokeHandler(handleInferenceEvaluation, {
+    puntoAcopioId: malteria._id,
+    saturacion: 63,
+    accesibilidad: 'Buena',
+    diasSinServicio: 3,
+    vehiculoId: gestorRaee._id,
+    capacidadRestantePct: 92,
+    volumenRaee: 90,
+    puntoEnEntornoSensible: true,
+    gestorDisponible: true,
+    tipoRaeeEsPeligroso: true,
+  });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.data.inputs.volumenRaee, 90);
+  assert.equal(res.data.inputs.capacidadRestantePct, 92);
+  assert.equal(res.data.inputs.tipoRaeeEsPeligroso, true);
+  assert.ok(res.data.activatedRules.some((r) => r.id === 'R20'));
+  assert.ok(res.data.activatedRules.some((r) => r.id === 'R32'));
+  assert.equal(res.data.operationalCriticidad, 'Criticidad_Critica');
+  assert.equal(res.data.recommendedVehicleType, 'RAEE_Especial');
+  assert.ok(res.data.score >= 70, `El puntaje global (${res.data.score}) debe reflejar urgencia Alta por jornada RAEE`);
+});
+
+test('11. Modo isomórfico navegador: src/fuzzy.js expone VillaVerdeFuzzy idéntico al motor Node.js', () => {
+  const vm = require('node:vm');
+  const fuzzyCode = fs.readFileSync(path.join(__dirname, '..', 'src', 'fuzzy.js'), 'utf8');
+  const sandbox = { window: {}, self: {} };
+  sandbox.self = sandbox.window;
+  vm.runInNewContext(fuzzyCode, sandbox);
+
+  assert.ok(sandbox.window.VillaVerdeFuzzy, 'Debe exponer window.VillaVerdeFuzzy');
+  assert.equal(sandbox.window.VillaVerdeFuzzy.RULE_DEFINITIONS.length, 32);
+
+  const sampleInput = {
+    saturation: 78,
+    daysWithoutService: 8,
+    accessibility: 'Regular',
+    puntoEnEntornoSensible: true,
+    capacidadRestantePct: 70,
+    volumenRaee: 82,
+    gestorDisponible: true,
+    tipoRaeeEsPeligroso: true,
+  };
+  const nodeResult = fuzzyPriority(sampleInput);
+  const browserResult = sandbox.window.VillaVerdeFuzzy.fuzzyPriority(sampleInput);
+  assert.equal(browserResult.score, nodeResult.score);
+  assert.equal(browserResult.criticidad, nodeResult.criticidad);
+  assert.equal(browserResult.activatedRules.length, nodeResult.activatedRules.length);
 });

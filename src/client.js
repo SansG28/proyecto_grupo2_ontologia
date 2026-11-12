@@ -13,6 +13,7 @@ let activeFilter = 'all';
 let markers = [];
 let currentRouteGeometry = null;
 let apiAvailable = false;
+let inferenceSeq = 0;
 
 /**
  * Base de datos operativa de respaldo (Manizales, Caldas) sincronizada al 100%
@@ -84,122 +85,30 @@ function buildEmbeddedManizalesTerritory() {
   return { zonas, puntos, vehiculos, eventos };
 }
 
-function localFuzzyEvaluate({ saturation, sensitivity, daysWithoutService, accessibility: acc }) {
-  const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
-  const trap = (v, [a, b, c, d]) => {
-    if (v < a || v > d) return 0;
-    if (v >= b && v <= c) return 1;
-    return v < b ? (v - a) / (b - a || 1) : (d - v) / (d - c || 1);
-  };
-  const tri = (v, [a, b, c]) => {
-    if (v < a || v > c) return 0;
-    if (v === b) return 1;
-    return v < b ? (v - a) / (b - a || 1) : (c - v) / (c - b || 1);
-  };
-  const satV = clamp(Number(saturation), 0, 100);
-  const sensV = clamp(Number(sensitivity), 0, 100);
-  const daysV = clamp(Number(daysWithoutService), 0, 15);
-  const access = ['Buena', 'Regular', 'Mala'].includes(acc) ? acc : 'Regular';
-
-  const sat = {
-    baja: trap(satV, [0, 0, 25, 45]),
-    media: tri(satV, [25, 52, 76]),
-    alta: trap(satV, [62, 88, 100, 100]),
-    critica: trap(satV, [82, 92, 100, 100]),
-  };
-  const sens = {
-    baja: trap(sensV, [0, 0, 25, 45]),
-    media: tri(sensV, [25, 50, 75]),
-    alta: trap(sensV, [60, 80, 100, 100]),
-  };
-  const days = {
-    pocos: trap(daysV, [0, 0, 2, 5]),
-    varios: tri(daysV, [2, 5, 8]),
-    muchos: trap(daysV, [6, 10, 15, 15]),
-  };
-
-  const outSets = {
-    baja: (v) => trap(v, [0, 0, 20, 38]),
-    media: (v) => tri(v, [25, 48, 68]),
-    alta: (v) => tri(v, [54, 70, 84]),
-    inmediata: (v) => trap(v, [78, 90, 100, 100]),
-  };
-
-  const rules = [];
-  const add = (id, description, activation, output) => {
-    if (activation > 0) rules.push({ id, description, activation: Math.round(activation * 1000) / 1000, output });
-  };
-  add('R01', 'SI la saturación es ALTA ENTONCES la prioridad de atención es INMEDIATA.', sat.alta, 'inmediata');
-  add('R02', 'SI la saturación es ALTA Y la sensibilidad del entorno es ALTA ENTONCES la atención es INMEDIATA.', Math.min(sat.alta, sens.alta), 'inmediata');
-  add('R03', 'SI hay MUCHOS días sin servicio Y la saturación es MEDIA o ALTA ENTONCES la atención es INMEDIATA.', Math.min(days.muchos, Math.max(sat.media, sat.alta)), 'inmediata');
-  add('R04', 'SI hay MUCHOS días sin servicio ENTONCES se eleva la prioridad a ALTA por equidad territorial.', days.muchos * (1 - sat.alta), 'alta');
-  add('R05', 'SI la sensibilidad del entorno y la saturación son MEDIAS ENTONCES se prioriza la zona en nivel ALTO.', Math.min(Math.max(sens.media, sens.alta), sat.media), 'alta');
-  add('R06', 'SI la saturación es MEDIA ENTONCES la atención es preferente (MEDIA).', sat.media * (1 - sens.alta * 0.5), 'media');
-  add('R07', 'SI la sensibilidad del entorno es ALTA Y la saturación no es crítica ENTONCES se eleva la atención preventiva.', sens.alta * (1 - sat.critica), 'alta');
-  add('R08', 'SI la saturación es BAJA Y los días sin servicio son POCOS ENTONCES se mantiene la atención regular (BAJA).', Math.min(sat.baja, days.pocos), 'baja');
-  add('R09', 'SI la accesibilidad vial es MALA por evento climático Y hay saturación ALTA ENTONCES se mantiene prioridad INMEDIATA con despacho de Volqueta.', access === 'Mala' ? Math.max(sat.alta, days.muchos * 0.8) : 0, 'inmediata');
-  add('R10', 'SI la saturación supera el umbral CRÍTICO (>=85%) ENTONCES se activa despacho prioritario en cabecera de ruta.', sat.critica, 'inmediata');
-
-  const agg = new Array(101).fill(0);
-  for (let s = 0; s <= 100; s += 1) {
-    for (const r of rules) {
-      agg[s] = Math.max(agg[s], Math.min(r.activation, outSets[r.output](s)));
-    }
-  }
-  const denom = agg.reduce((sum, m) => sum + m, 0);
-  const centroid = denom === 0 ? 0 : agg.reduce((sum, m, idx) => sum + m * idx, 0) / denom;
-  const pressure = (satV * 0.06) + (daysV * 0.25) + (sensV * 0.02);
-  const score = denom === 0 ? 0 : Math.round(clamp(centroid * 0.92 + pressure, 0, 99.5) * 10) / 10;
-  const priority = score >= 78 ? 'Inmediata' : score >= 55 ? 'Alta' : score >= 30 ? 'Media' : 'Baja';
-
-  return {
-    score,
-    priority,
-    accessibility: access,
-    recommendedVehicleType: access === 'Mala' ? 'Volqueta' : 'Compactador / Estándar',
-    accessibilityAdvice: access === 'Mala'
-      ? 'Vía afectada o de difícil acceso: asignar unidad tipo Volqueta Veredal y reevaluar corredor; la restricción vial no elimina la prioridad sanitaria.'
-      : access === 'Regular'
-        ? 'Tránsito con precaución por pendiente o humedad en calzada; mantener monitoreo operativo.'
-        : 'Acceso vial despejado y compatible con despacho ordinario de flota.',
-    memberships: { saturation: sat, sensitivity: sens, daysWithoutService: days },
-    activatedRules: rules.sort((a, b) => b.activation - a.activation),
-  };
+function getFuzzyEngine() {
+  return window.VillaVerdeFuzzy;
 }
 
-function computeLocalStops(vehicleType = 'Compactador') {
-  const evaluated = territory.puntos.map((point) => {
-    const zId = String(point.zona_id?._id || point.zona_id);
-    const zEvents = (territory.eventos || []).filter((e) => String(e.zona_id) === zId);
-    const compSev = zEvents.filter((e) => e.tipo_evento === 'QuejaCiudadana').reduce((m, e) => Math.max(m, e.severidad), 0);
-    const hasMala = zEvents.some((e) => e.tipo_evento === 'EventoClimatico' && e.estado_via === 'Mala');
-    const effAcc = hasMala || point.accesibilidad_actual === 'Mala' ? 'Mala' : (point.accesibilidad_actual || 'Buena');
-    const effSens = Math.min(100, (point.zona_id?.sensibilidad_entorno ?? 70) + compSev * 5);
-    const satIn = vehicleType === 'RAEE_Especial' ? point.saturacion_raee : point.saturacion_ordinarios;
-    const ev = localFuzzyEvaluate({
-      saturation: satIn,
-      sensitivity: effSens,
-      daysWithoutService: point.zona_id?.dias_sin_servicio ?? 1,
-      accessibility: effAcc,
-    });
-    return { point, ev, satIn };
+function getEventsByZoneLocal() {
+  const mapByZone = new Map();
+  (territory?.eventos || []).filter((e) => e.activo !== false).forEach((event) => {
+    const zoneId = String(event.zona_id?._id || event.zona_id);
+    mapByZone.set(zoneId, [...(mapByZone.get(zoneId) || []), event]);
   });
+  return mapByZone;
+}
 
-  return evaluated
-    .filter(({ ev }) => ev.priority === 'Inmediata' || ev.priority === 'Alta')
-    .sort((a, b) => b.ev.score - a.ev.score)
-    .map((item, idx) => ({
-      orden: idx + 1,
-      id: String(item.point._id),
-      nombre: item.point.nombre,
-      barrios_cobertura: item.point.barrios_cobertura || [],
-      saturacion: item.satIn,
-      dias_sin_servicio: item.point.zona_id?.dias_sin_servicio ?? 1,
-      accesibilidad: item.ev.accessibility,
-      score: item.ev.score,
-      prioridad: item.ev.priority,
-      coordinates: item.point.ubicacion.coordinates,
-    }));
+function hasAvailableRaeeManagerLocal() {
+  return (territory?.vehiculos || []).some(
+    (v) => v.tipo === 'RAEE_Especial' && v.disponible !== false && Number(v.capacidad_restante) > 0,
+  );
+}
+
+function computeLocalStops(vehicleOrType = 'Compactador', gestorOverride = null) {
+  const engine = getFuzzyEngine();
+  const eventsByZone = getEventsByZoneLocal();
+  const gestorDisponible = typeof gestorOverride === 'boolean' ? gestorOverride : hasAvailableRaeeManagerLocal();
+  return engine.prioritizeRouteStops(territory.puntos, eventsByZone, vehicleOrType, { gestorDisponible });
 }
 
 async function requestJson(url, options = {}) {
@@ -255,7 +164,19 @@ function setAccessibilityUI(value) {
 
 function formatSaturationText(val) {
   const n = Number(val);
-  const tag = n >= 85 ? 'Crítica' : n >= 62 ? 'Alta' : n >= 35 ? 'Media' : 'Baja';
+  const tag = n >= 80 ? 'Alta' : n >= 35 ? 'Media' : 'Baja';
+  return `${n}% (${tag})`;
+}
+
+function formatCapacityText(val) {
+  const n = Number(val);
+  const tag = n >= 60 ? 'Alta' : n >= 35 ? 'Media' : 'Baja';
+  return `${n}% (${tag})`;
+}
+
+function formatRaeeText(val) {
+  const n = Number(val);
+  const tag = n >= 65 ? 'Alto' : n >= 35 ? 'Medio' : 'Bajo';
   return `${n}% (${tag})`;
 }
 
@@ -288,11 +209,50 @@ function updatePointSelection(pointId, shouldRunInference = false) {
 
   const saturation = document.getElementById('saturation-slider');
   const days = document.getElementById('days-slider');
+  const raeeSlider = document.getElementById('raee-volume-slider');
+  const capacitySlider = document.getElementById('capacity-slider');
+  const sensitiveToggle = document.getElementById('sensitive-env-toggle');
+  const gestorToggle = document.getElementById('gestor-available-toggle');
+  const raeeDangerousToggle = document.getElementById('raee-dangerous-toggle');
+
   saturation.value = point.saturacion_ordinarios;
   days.value = point.zona_id?.dias_sin_servicio ?? 1;
   document.getElementById('saturation-value').textContent = formatSaturationText(saturation.value);
   document.getElementById('days-value').textContent = `${days.value} días`;
   setAccessibilityUI(point.accesibilidad_actual || 'Buena');
+
+  if (raeeSlider) {
+    raeeSlider.value = point.saturacion_raee ?? 0;
+    document.getElementById('raee-volume-value').textContent = formatRaeeText(raeeSlider.value);
+  }
+  if (capacitySlider) {
+    const vehicleId = document.getElementById('route-vehicle')?.value;
+    const selectedVehicle = territory.vehiculos.find((v) => String(v._id) === String(vehicleId));
+    const capVal = selectedVehicle ? selectedVehicle.capacidad_restante : 80;
+    capacitySlider.value = capVal;
+    document.getElementById('capacity-value').textContent = formatCapacityText(capVal);
+  }
+  if (sensitiveToggle) {
+    const eventsByZone = getEventsByZoneLocal();
+    const ctx = getFuzzyEngine().deriveScenarioContext(
+      eventsByZone.get(String(point.zona_id?._id || point.zona_id)) || [],
+      point.zona_id?.sensibilidad_entorno ?? 50,
+      point.accesibilidad_actual || 'Buena',
+    );
+    sensitiveToggle.checked = typeof point.entorno_sensible === 'boolean'
+      ? point.entorno_sensible
+      : ctx.puntoEnEntornoSensible;
+  }
+  if (gestorToggle) {
+    gestorToggle.checked = typeof point.gestor_disponible === 'boolean'
+      ? point.gestor_disponible
+      : hasAvailableRaeeManagerLocal();
+  }
+  if (raeeDangerousToggle) {
+    raeeDangerousToggle.checked = typeof point.raee_peligroso === 'boolean'
+      ? point.raee_peligroso
+      : getFuzzyEngine().isRaeeDangerous(point.tipos_raee_acumulados);
+  }
 
   const barriosEl = document.getElementById('inference-point-barrios');
   if (barriosEl) {
@@ -412,6 +372,15 @@ function populateControls() {
   });
   pointSelect.addEventListener('change', () => updatePointSelection(pointSelect.value, true));
 
+  const vehicleSelect = document.getElementById('route-vehicle');
+  vehicleSelect.replaceChildren();
+  territory.vehiculos.filter((v) => v.disponible).forEach((vehicle) => {
+    const option = document.createElement('option');
+    option.value = vehicle._id;
+    option.textContent = `${vehicle.identificador} (${vehicle.tipo}) · Cap. ${vehicle.capacidad_restante}%`;
+    vehicleSelect.appendChild(option);
+  });
+
   const mallPlaza = territory.puntos.find((p) => p.nombre === 'Mall Plaza') || territory.puntos[0];
   if (mallPlaza) {
     pointSelect.value = mallPlaza._id;
@@ -425,15 +394,6 @@ function populateControls() {
       `${mallPlaza.direccion_referencia}. RAEE recibidos: ${(mallPlaza.tipos_raee_acumulados || []).join(', ')}.`,
     );
   }
-
-  const vehicleSelect = document.getElementById('route-vehicle');
-  vehicleSelect.replaceChildren();
-  territory.vehiculos.filter((v) => v.disponible).forEach((vehicle) => {
-    const option = document.createElement('option');
-    option.value = vehicle._id;
-    option.textContent = `${vehicle.identificador} (${vehicle.tipo}) · Cap. ${vehicle.capacidad_restante}%`;
-    vehicleSelect.appendChild(option);
-  });
 }
 
 /**
@@ -629,27 +589,35 @@ function renderDynamicRouteTable(stops, highlightedId = null) {
 
 function styleRuleDescription(desc) {
   return desc
-    .replace(/\b(SI|ENTONCES|Y)\b/g, '<span class="text-white font-bold">$1</span>')
-    .replace(/\b(ALTA|INMEDIATA|CRÍTICO|MALA|MUCHOS)\b/g, '<span class="text-red-400 font-bold">$1</span>')
-    .replace(/\b(MEDIA|MEDIAS|ALTO|REGULAR)\b/g, '<span class="text-amber-400 font-bold">$1</span>')
-    .replace(/\b(BAJA|POCOS)\b/g, '<span class="text-cyan-400 font-bold">$1</span>');
+    .replace(/\b(SI|ENTONCES|Y|es)\b/g, '<span class="text-white font-bold">$1</span>')
+    .replace(/\b(Criticidad_Critica|NivelAccesibilidad_Mala|NivelVolumenRAEE_Alto|Alta|Alto|true)\b/g, '<span class="text-red-400 font-bold">$1</span>')
+    .replace(/\b(Criticidad_Alta|Criticidad_Media|NivelAccesibilidad_Regular|NivelVolumenRAEE_Medio|Media|Medio)\b/g, '<span class="text-amber-400 font-bold">$1</span>')
+    .replace(/\b(Criticidad_Baja|NivelAccesibilidad_Buena|NivelVolumenRAEE_Bajo|Baja|Bajo|false)\b/g, '<span class="text-cyan-400 font-bold">$1</span>');
 }
 
-async function calculateRoute() {
+async function calculateRoute(preserveTable = false) {
   const status = document.getElementById('route-status');
   const vehicleId = document.getElementById('route-vehicle').value;
   if (!vehicleId) return;
+  const capEl = document.getElementById('capacity-slider');
+  const gestorEl = document.getElementById('gestor-available-toggle');
+  const capVal = capEl ? Number(capEl.value) : undefined;
+  const gestorVal = gestorEl ? Boolean(gestorEl.checked) : undefined;
 
   if (apiAvailable) {
     try {
       const result = await requestJson('/api/rutas/calcular', {
         method: 'POST',
-        body: JSON.stringify({ vehiculoId: vehicleId }),
+        body: JSON.stringify({
+          vehiculoId: vehicleId,
+          capacidadRestantePct: capVal,
+          gestorDisponible: gestorVal,
+        }),
       });
       showRoute(result.routes);
       if (result.routes.length) {
         const route = result.routes[0];
-        renderDynamicRouteTable(route.stops, selectedPointId);
+        if (preserveTable !== true) renderDynamicRouteTable(route.stops, selectedPointId);
         const kilometers = (route.distanceMeters / 1000).toFixed(1);
         const minutes = Math.round(route.durationSeconds / 60);
         status.textContent = `${route.stops.length} paradas · ${kilometers} km · ${minutes} min · Cabecera: #1 ${route.stops[0]?.nombre || ''}`;
@@ -660,11 +628,12 @@ async function calculateRoute() {
     }
   }
 
-  const vehicle = territory.vehiculos.find((v) => v._id === vehicleId) || territory.vehiculos[0];
-  const stops = computeLocalStops(vehicle.tipo).slice(0, 12);
+  const baseVehicle = territory.vehiculos.find((v) => v._id === vehicleId) || territory.vehiculos[0];
+  const vehicle = capVal !== undefined ? { ...baseVehicle, capacidad_restante: capVal } : baseVehicle;
+  const stops = computeLocalStops(vehicle, gestorVal).slice(0, 12);
   const coords = [vehicle.ubicacion_actual.coordinates, ...stops.map((s) => s.coordinates)];
   showRoute([{ geometry: { type: 'LineString', coordinates: coords } }]);
-  renderDynamicRouteTable(stops, selectedPointId);
+  if (preserveTable !== true) renderDynamicRouteTable(stops, selectedPointId);
   status.textContent = `${stops.length} paradas priorizadas en Manizales · Cabecera: #1 ${stops[0]?.nombre || ''}`;
 }
 
@@ -673,13 +642,33 @@ function renderInferenceResult(result) {
   document.getElementById('priority-score').className = 'text-4xl font-extrabold drop-shadow-md '
     + (result.priority === 'Inmediata' ? 'text-red-500' : result.priority === 'Alta' ? 'text-amber-400' : 'text-cyan-400');
 
-  document.getElementById('priority-label').textContent = `Atención ${result.priority}`;
+  document.getElementById('priority-label').textContent = `Atención ${result.priority} (${result.criticidad || 'Criticidad_Media'})`;
   document.getElementById('priority-label').className = 'px-3.5 py-1 mt-2 text-xs font-bold rounded-full '
     + (result.priority === 'Inmediata'
       ? 'bg-red-500/20 text-red-400 border border-red-500/30'
       : result.priority === 'Alta'
         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
         : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30');
+
+  const sanitaryBadge = document.getElementById('sanitary-criticality-badge');
+  if (sanitaryBadge) {
+    sanitaryBadge.textContent = `${result.sanitaryCriticidad || result.criticidad} (${result.sanitaryScore ?? result.score}%)`;
+  }
+  const operationalBadge = document.getElementById('operational-criticality-badge');
+  if (operationalBadge) {
+    operationalBadge.textContent = `${result.operationalCriticidad || result.criticidad} (${result.operationalScore ?? result.score}%)`;
+  }
+
+  const actionBox = document.getElementById('operational-action-box');
+  if (actionBox) {
+    if (result.operationalActions?.length) {
+      actionBox.classList.remove('hidden');
+      actionBox.innerHTML = `<span class="font-bold text-amber-400">&gt;&gt; ACCIÓN BLOQUE 2:</span> ${result.operationalActions[0].message}`;
+    } else {
+      actionBox.classList.add('hidden');
+      actionBox.textContent = '';
+    }
+  }
 
   const rankBadge = document.getElementById('route-rank-badge');
   if (result.routeOrderPosition) {
@@ -691,25 +680,30 @@ function renderInferenceResult(result) {
   }
 
   document.getElementById('recommended-vehicle').textContent = result.recommendedVehicleType || 'Compactador / Estándar';
-  document.getElementById('explanation').textContent = `Se prioriza el despacho hacia "${result.puntoAcopio.nombre}" (${result.zona.nombre} · Cobertura: ${(result.puntoAcopio.barrios_cobertura || []).join(', ')}) con nivel ${result.priority.toUpperCase()} (${result.score}%) por saturación del ${result.inputs.saturation}%, sensibilidad territorial del ${result.inputs.sensitivity}% y ${result.inputs.daysWithoutService} días sin servicio. ${result.accessibilityAdvice}`;
+  document.getElementById('explanation').textContent = `Se evalúa "${result.puntoAcopio.nombre}" (${result.zona.nombre} · Cobertura: ${(result.puntoAcopio.barrios_cobertura || []).join(', ')}) con centroide global ${result.score}% (${result.criticidad || result.priority}) y criticidad sanitaria ${result.sanitaryScore ?? result.score}% (${result.sanitaryCriticidad || result.priority}) por saturación ${result.inputs.saturation}%, ${result.inputs.daysWithoutService} días sin servicio, entorno sensible=${result.inputs.puntoEnEntornoSensible}, capacidad=${result.inputs.capacidadRestantePct}% y volumen RAEE=${result.inputs.volumenRaee}%. ${result.accessibilityAdvice}`;
 
   const memSummary = document.getElementById('membership-summary');
   if (memSummary && result.memberships) {
     const satM = result.memberships.saturation;
-    const sensM = result.memberships.sensitivity;
     const daysM = result.memberships.daysWithoutService;
+    const capM = result.memberships.capacity || { Baja: 0, Alta: 0 };
+    const raeeM = result.memberships.raeeVolume || { Bajo: 0, Medio: 0, Alto: 0 };
     memSummary.innerHTML = `
       <div class="p-2 rounded-lg bg-gray-900/80 border border-gray-800">
         <div class="text-cyan-400 font-bold mb-0.5">μ(Saturación)</div>
-        <div class="text-gray-300">B:${satM.baja.toFixed(2)} M:${satM.media.toFixed(2)} A:${satM.alta.toFixed(2)}</div>
-      </div>
-      <div class="p-2 rounded-lg bg-gray-900/80 border border-gray-800">
-        <div class="text-emerald-400 font-bold mb-0.5">μ(Sensibilidad)</div>
-        <div class="text-gray-300">B:${sensM.baja.toFixed(2)} M:${sensM.media.toFixed(2)} A:${sensM.alta.toFixed(2)}</div>
+        <div class="text-gray-300">B:${(satM.Baja ?? satM.baja).toFixed(2)} M:${(satM.Media ?? satM.media).toFixed(2)} A:${(satM.Alta ?? satM.alta).toFixed(2)}</div>
       </div>
       <div class="p-2 rounded-lg bg-gray-900/80 border border-gray-800">
         <div class="text-amber-400 font-bold mb-0.5">μ(Días sin Serv.)</div>
-        <div class="text-gray-300">P:${daysM.pocos.toFixed(2)} V:${daysM.varios.toFixed(2)} M:${daysM.muchos.toFixed(2)}</div>
+        <div class="text-gray-300">B:${(daysM.Bajo ?? daysM.pocos).toFixed(2)} M:${(daysM.Medio ?? daysM.varios).toFixed(2)} A:${(daysM.Alto ?? daysM.muchos).toFixed(2)}</div>
+      </div>
+      <div class="p-2 rounded-lg bg-gray-900/80 border border-gray-800">
+        <div class="text-emerald-400 font-bold mb-0.5">μ(Capacidad Flota)</div>
+        <div class="text-gray-300">B:${capM.Baja.toFixed(2)} A:${capM.Alta.toFixed(2)}</div>
+      </div>
+      <div class="p-2 rounded-lg bg-gray-900/80 border border-gray-800">
+        <div class="text-purple-400 font-bold mb-0.5">μ(Volumen RAEE)</div>
+        <div class="text-gray-300">B:${raeeM.Bajo.toFixed(2)} M:${raeeM.Medio.toFixed(2)} A:${raeeM.Alto.toFixed(2)}</div>
       </div>
     `;
   }
@@ -719,12 +713,18 @@ function renderInferenceResult(result) {
   result.activatedRules.forEach((rule, idx) => {
     const card = document.createElement('div');
     const isTop = idx === 0;
+    const isBlock1 = rule.block === 'Bloque 1';
     card.className = isTop
       ? 'p-3 rounded-xl bg-emerald-900/30 border border-emerald-500/50 text-gray-200'
-      : 'p-3 rounded-xl bg-purple-900/30 border border-purple-500/40 text-gray-300';
+      : isBlock1
+        ? 'p-3 rounded-xl bg-cyan-950/30 border border-cyan-500/35 text-gray-300'
+        : 'p-3 rounded-xl bg-purple-900/30 border border-purple-500/40 text-gray-300';
     card.innerHTML = `
-      <div class="flex justify-between items-center mb-1">
-        <span class="${isTop ? 'text-emerald-400' : 'text-purple-400'} font-bold">${rule.id}:</span>
+      <div class="flex justify-between items-center mb-1 gap-2">
+        <div class="flex items-center gap-1.5">
+          <span class="${isTop ? 'text-emerald-400' : isBlock1 ? 'text-cyan-400' : 'text-purple-400'} font-bold">${rule.id}</span>
+          <span class="px-1.5 py-0.5 rounded bg-gray-900/80 text-[9px] text-gray-300 border border-gray-700">${rule.block || 'Bloque 1'}</span>
+        </div>
         <span class="px-2 py-0.5 rounded bg-gray-900/80 text-[10px] font-bold text-white">Activación ${Math.round(rule.activation * 100)}%</span>
       </div>
       <div>${styleRuleDescription(rule.description)}</div>
@@ -741,56 +741,94 @@ async function runInference() {
   const status = document.getElementById('inference-status');
   const button = document.getElementById('run-inference');
   if (!selectedPointId) return;
+  const seq = ++inferenceSeq;
   const satVal = Number(document.getElementById('saturation-slider').value);
   const daysVal = Number(document.getElementById('days-slider').value);
+  const capVal = Number(document.getElementById('capacity-slider')?.value ?? 80);
+  const raeeVal = Number(document.getElementById('raee-volume-slider')?.value ?? 0);
+  const sensitiveVal = Boolean(document.getElementById('sensitive-env-toggle')?.checked);
+  const gestorVal = Boolean(document.getElementById('gestor-available-toggle')?.checked ?? true);
+  const dangerousVal = Boolean(document.getElementById('raee-dangerous-toggle')?.checked);
   button.disabled = true;
 
   try {
     if (apiAvailable) {
-      const vehicleId = document.getElementById('route-vehicle')?.value;
-      const result = await requestJson('/api/inferencia/evaluar', {
-        method: 'POST',
-        body: JSON.stringify({
-          puntoAcopioId: selectedPointId,
-          saturacion: satVal,
-          accesibilidad: accessibility,
-          diasSinServicio: daysVal,
-          vehiculoId,
-        }),
-      });
-      const localPoint = territory.puntos.find((p) => p._id === selectedPointId);
-      if (localPoint) {
-        localPoint.saturacion_ordinarios = satVal;
-        localPoint.accesibilidad_actual = result.inputs.accessibility;
-        if (localPoint.zona_id) localPoint.zona_id.dias_sin_servicio = daysVal;
+      try {
+        const vehicleId = document.getElementById('route-vehicle')?.value;
+        const result = await requestJson('/api/inferencia/evaluar', {
+          method: 'POST',
+          body: JSON.stringify({
+            puntoAcopioId: selectedPointId,
+            saturacion: satVal,
+            accesibilidad: accessibility,
+            diasSinServicio: daysVal,
+            vehiculoId: vehicleId,
+            capacidadRestantePct: capVal,
+            volumenRaee: raeeVal,
+            puntoEnEntornoSensible: sensitiveVal,
+            gestorDisponible: gestorVal,
+            tipoRaeeEsPeligroso: dangerousVal,
+          }),
+        });
+        if (seq !== inferenceSeq) return;
+        const localPoint = territory.puntos.find((p) => p._id === selectedPointId);
+        if (localPoint) {
+          localPoint.saturacion_ordinarios = satVal;
+          localPoint.saturacion_raee = raeeVal;
+          localPoint.accesibilidad_actual = result.inputs.accessibility;
+          localPoint.entorno_sensible = sensitiveVal;
+          localPoint.gestor_disponible = gestorVal;
+          localPoint.raee_peligroso = dangerousVal;
+          if (localPoint.zona_id) localPoint.zona_id.dias_sin_servicio = daysVal;
+        }
+        renderInferenceResult(result);
+        await calculateRoute(true);
+        if (seq === inferenceSeq) {
+          status.textContent = `Motor Mamdani (R1–R32) ejecutado para ${result.puntoAcopio.nombre}. Ruta actualizada.`;
+        }
+        return;
+      } catch (apiErr) {
+        console.warn('Error en /api/inferencia/evaluar, usando motor local:', apiErr);
       }
-      renderInferenceResult(result);
-      await calculateRoute();
-      status.textContent = `Motor Mamdani ejecutado para ${result.puntoAcopio.nombre}. Ruta actualizada.`;
-      return;
     }
 
     // Ejecución local directa cuando se abre prueba.html sin servidor
+    const engine = getFuzzyEngine();
     const point = territory.puntos.find((p) => p._id === selectedPointId);
     if (!point) return;
     point.saturacion_ordinarios = satVal;
+    point.saturacion_raee = raeeVal;
     point.accesibilidad_actual = accessibility;
+    point.entorno_sensible = sensitiveVal;
+    point.gestor_disponible = gestorVal;
+    point.raee_peligroso = dangerousVal;
     if (point.zona_id) point.zona_id.dias_sin_servicio = daysVal;
 
     const zId = String(point.zona_id?._id || point.zona_id);
     const zEvents = (territory.eventos || []).filter((e) => String(e.zona_id) === zId);
-    const compSev = zEvents.filter((e) => e.tipo_evento === 'QuejaCiudadana').reduce((m, e) => Math.max(m, e.severidad), 0);
-    const hasMala = zEvents.some((e) => e.tipo_evento === 'EventoClimatico' && e.estado_via === 'Mala');
-    const effAcc = hasMala || accessibility === 'Mala' ? 'Mala' : accessibility;
-    const effSens = Math.min(100, (point.zona_id?.sensibilidad_entorno ?? 75) + compSev * 5);
+    const ctx = engine.deriveScenarioContext(
+      zEvents,
+      point.zona_id?.sensibilidad_entorno ?? 75,
+      accessibility,
+    );
 
-    const evalRes = localFuzzyEvaluate({
+    const evalRes = engine.fuzzyPriority({
       saturation: satVal,
-      sensitivity: effSens,
+      sensitivity: ctx.sensitivity,
       daysWithoutService: daysVal,
-      accessibility: effAcc,
+      accessibility: ctx.accessibility,
+      puntoEnEntornoSensible: sensitiveVal,
+      capacidadRestantePct: capVal,
+      volumenRaee: raeeVal,
+      gestorDisponible: gestorVal,
+      tipoRaeeEsPeligroso: dangerousVal,
     });
-    const stops = computeLocalStops('Compactador');
+    const vehicleId = document.getElementById('route-vehicle')?.value;
+    const selectedVehicle = territory.vehiculos.find((v) => String(v._id) === String(vehicleId));
+    const stops = computeLocalStops(
+      selectedVehicle ? { ...selectedVehicle, capacidad_restante: capVal } : { tipo: 'Compactador', capacidad_restante: capVal },
+      gestorVal,
+    );
     const stopIdx = stops.findIndex((s) => String(s.id) === String(point._id));
 
     renderInferenceResult({
@@ -805,16 +843,26 @@ async function runInference() {
       },
       inputs: {
         saturation: satVal,
-        sensitivity: effSens,
+        sensitivity: ctx.sensitivity,
         daysWithoutService: daysVal,
         accessibility: evalRes.accessibility,
+        puntoEnEntornoSensible: sensitiveVal,
+        capacidadRestantePct: capVal,
+        volumenRaee: raeeVal,
+        gestorDisponible: gestorVal,
+        tipoRaeeEsPeligroso: dangerousVal,
       },
       routeOrderPosition: stopIdx >= 0 ? stopIdx + 1 : null,
       updatedRouteStops: stops,
       ...evalRes,
     });
-    await calculateRoute();
-    status.textContent = `Motor Mamdani ejecutado para ${point.nombre}. Ruta actualizada.`;
+    await calculateRoute(true);
+    if (seq === inferenceSeq) {
+      status.textContent = `Motor Mamdani (R1–R32) ejecutado para ${point.nombre}. Ruta actualizada.`;
+    }
+  } catch (error) {
+    console.error('Error al ejecutar el motor difuso:', error);
+    if (status) status.textContent = `Error al evaluar inferencia: ${error.message}`;
   } finally {
     button.disabled = false;
   }
@@ -887,6 +935,30 @@ async function initialize() {
   document.getElementById('days-slider').addEventListener('input', (event) => {
     document.getElementById('days-value').textContent = `${event.target.value} días`;
     runInference();
+  });
+
+  document.getElementById('capacity-slider')?.addEventListener('input', (event) => {
+    document.getElementById('capacity-value').textContent = formatCapacityText(event.target.value);
+    runInference();
+  });
+
+  document.getElementById('raee-volume-slider')?.addEventListener('input', (event) => {
+    document.getElementById('raee-volume-value').textContent = formatRaeeText(event.target.value);
+    runInference();
+  });
+
+  ['sensitive-env-toggle', 'gestor-available-toggle', 'raee-dangerous-toggle'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('change', () => runInference());
+  });
+
+  document.getElementById('route-vehicle')?.addEventListener('change', (event) => {
+    const vehicle = territory?.vehiculos.find((v) => String(v._id) === String(event.target.value));
+    const capSlider = document.getElementById('capacity-slider');
+    if (vehicle && capSlider) {
+      capSlider.value = vehicle.capacidad_restante;
+      document.getElementById('capacity-value').textContent = formatCapacityText(vehicle.capacidad_restante);
+    }
+    calculateRoute();
   });
 
   document.querySelectorAll('.accessibility-option').forEach((button) => {

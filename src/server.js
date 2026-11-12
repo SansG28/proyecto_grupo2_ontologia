@@ -15,6 +15,7 @@ const {
   fuzzyPriority,
   deriveScenarioContext,
   prioritizeRouteStops,
+  isRaeeDangerous,
 } = require('./fuzzy');
 const seedData = require('./seed');
 
@@ -28,6 +29,7 @@ app.use('/api', (req, res, next) => {
   next();
 });
 app.get('/', (req, res) => res.sendFile(path.join(publicDirectory, 'prueba.html')));
+app.get('/src/fuzzy.js', (req, res) => res.sendFile(path.join(__dirname, 'fuzzy.js')));
 app.get('/src/client.js', (req, res) => res.sendFile(path.join(__dirname, 'client.js')));
 app.get('/ontology/villa_verde_v3.owl', (req, res) => {
   res.type('application/rdf+xml');
@@ -159,6 +161,65 @@ function getEventsByZoneMap(eventos) {
   return map;
 }
 
+function hasAvailableRaeeManager(vehiculos = []) {
+  return vehiculos.some(
+    (v) => v.tipo === 'RAEE_Especial' && v.disponible !== false && Number(v.capacidad_restante) > 0,
+  );
+}
+
+function enrichPointsForMap(puntos, eventos, vehiculos, stringifyIds = false) {
+  const eventsByZone = getEventsByZoneMap(eventos);
+  const gestorDisponible = hasAvailableRaeeManager(vehiculos);
+
+  return puntos.map((punto) => {
+    const zId = punto.zona_id ? String(punto.zona_id._id || punto.zona_id) : '';
+    const ctx = deriveScenarioContext(
+      eventsByZone.get(zId) || [],
+      punto.zona_id?.sensibilidad_entorno ?? 50,
+      punto.accesibilidad_actual || 'Buena',
+    );
+    const puntoSensible = typeof punto.entorno_sensible === 'boolean'
+      ? punto.entorno_sensible
+      : ctx.puntoEnEntornoSensible;
+    const raeePeligroso = isRaeeDangerous(punto.tipos_raee_acumulados);
+    const evalOrd = fuzzyPriority({
+      saturation: punto.saturacion_ordinarios,
+      sensitivity: ctx.sensitivity,
+      daysWithoutService: punto.zona_id?.dias_sin_servicio ?? 1,
+      accessibility: ctx.accessibility,
+      puntoEnEntornoSensible: puntoSensible,
+      capacidadRestantePct: 80,
+      volumenRaee: punto.saturacion_raee,
+      gestorDisponible,
+      tipoRaeeEsPeligroso: raeePeligroso,
+    });
+
+    const base = {
+      ...punto,
+      _id: String(punto._id),
+      entorno_sensible: puntoSensible,
+      raee_peligroso: raeePeligroso,
+      prioridad_calculada: evalOrd.priority,
+      criticidad_calculada: evalOrd.criticidad,
+      score_calculado: evalOrd.score,
+    };
+
+    if (stringifyIds && punto.zona_id) {
+      base.zona_id = {
+        _id: String(punto.zona_id._id),
+        codigo: punto.zona_id.codigo,
+        nombre: punto.zona_id.nombre,
+        hito_referencia: punto.zona_id.hito_referencia,
+        barrios_agrupados: punto.zona_id.barrios_agrupados,
+        sensibilidad_entorno: punto.zona_id.sensibilidad_entorno,
+        dias_sin_servicio: punto.zona_id.dias_sin_servicio,
+      };
+    }
+
+    return base;
+  });
+}
+
 async function getMapData() {
   if (mongoose.connection.readyState === 1) {
     const [zonas, puntos, vehiculos, eventos, rutas] = await Promise.all([
@@ -169,39 +230,9 @@ async function getMapData() {
       Ruta.find({ activa: true }).lean(),
     ]);
     if (zonas.length && puntos.length && vehiculos.length) {
-      const eventsByZone = getEventsByZoneMap(eventos);
-      const enrichedPoints = puntos.map((punto) => {
-        const zId = punto.zona_id ? String(punto.zona_id._id) : '';
-        const ctx = deriveScenarioContext(
-          eventsByZone.get(zId) || [],
-          punto.zona_id?.sensibilidad_entorno ?? 50,
-          punto.accesibilidad_actual || 'Buena',
-        );
-        const evalOrd = fuzzyPriority({
-          saturation: punto.saturacion_ordinarios,
-          sensitivity: ctx.sensitivity,
-          daysWithoutService: punto.zona_id?.dias_sin_servicio ?? 1,
-          accessibility: ctx.accessibility,
-        });
-        return {
-          ...punto,
-          _id: String(punto._id),
-          prioridad_calculada: evalOrd.priority,
-          score_calculado: evalOrd.score,
-          zona_id: punto.zona_id ? {
-            _id: String(punto.zona_id._id),
-            codigo: punto.zona_id.codigo,
-            nombre: punto.zona_id.nombre,
-            hito_referencia: punto.zona_id.hito_referencia,
-            barrios_agrupados: punto.zona_id.barrios_agrupados,
-            sensibilidad_entorno: punto.zona_id.sensibilidad_entorno,
-            dias_sin_servicio: punto.zona_id.dias_sin_servicio,
-          } : null,
-        };
-      });
       return {
         zonas: zonas.map((z) => ({ ...z, _id: String(z._id) })),
-        puntos: enrichedPoints,
+        puntos: enrichPointsForMap(puntos, eventos, vehiculos, true),
         vehiculos: vehiculos.map((v) => ({ ...v, _id: String(v._id) })),
         eventos: eventos.map((e) => ({ ...e, _id: String(e._id), zona_id: String(e.zona_id) })),
         rutas: rutas.map((r) => ({ ...r, _id: String(r._id) })),
@@ -209,28 +240,14 @@ async function getMapData() {
     }
   }
 
-  const eventsByZone = getEventsByZoneMap(operationalStore.eventos);
   return {
     zonas: operationalStore.zonas,
-    puntos: operationalStore.puntos.map((punto) => {
-      const zId = String(punto.zona_id?._id || '');
-      const ctx = deriveScenarioContext(
-        eventsByZone.get(zId) || [],
-        punto.zona_id?.sensibilidad_entorno ?? 50,
-        punto.accesibilidad_actual || 'Buena',
-      );
-      const evalOrd = fuzzyPriority({
-        saturation: punto.saturacion_ordinarios,
-        sensitivity: ctx.sensitivity,
-        daysWithoutService: punto.zona_id?.dias_sin_servicio ?? 1,
-        accessibility: ctx.accessibility,
-      });
-      return {
-        ...punto,
-        prioridad_calculada: evalOrd.priority,
-        score_calculado: evalOrd.score,
-      };
-    }),
+    puntos: enrichPointsForMap(
+      operationalStore.puntos,
+      operationalStore.eventos,
+      operationalStore.vehiculos,
+      false,
+    ),
     vehiculos: operationalStore.vehiculos,
     eventos: operationalStore.eventos,
     rutas: operationalStore.rutas,
@@ -293,6 +310,11 @@ async function handleInferenceEvaluation(req, res, next) {
       accesibilidad,
       diasSinServicio,
       vehiculoId,
+      capacidadRestantePct,
+      volumenRaee,
+      puntoEnEntornoSensible,
+      gestorDisponible,
+      tipoRaeeEsPeligroso,
     } = req.body || {};
 
     if (!puntoAcopioId || !mongoose.isValidObjectId(puntoAcopioId)) {
@@ -307,27 +329,37 @@ async function handleInferenceEvaluation(req, res, next) {
     if (!Number.isFinite(diasSinServicio) || diasSinServicio < 0 || diasSinServicio > 15) {
       return apiError(res, 400, 'diasSinServicio debe ser un número entre 0 y 15.');
     }
+    if (capacidadRestantePct !== undefined && (!Number.isFinite(capacidadRestantePct) || capacidadRestantePct < 0 || capacidadRestantePct > 100)) {
+      return apiError(res, 400, 'capacidadRestantePct debe ser un número entre 0 y 100.');
+    }
+    if (volumenRaee !== undefined && (!Number.isFinite(volumenRaee) || volumenRaee < 0 || volumenRaee > 100)) {
+      return apiError(res, 400, 'volumenRaee debe ser un número entre 0 y 100.');
+    }
 
     let punto;
     let zona;
     let allPoints;
     let allEvents;
-    let selectedVehicleType = 'Compactador';
+    let allVehicles = operationalStore.vehiculos;
+    let selectedVehicle = null;
 
     if (mongoose.connection.readyState === 1) {
       const dbPoint = await PuntoAcopio.findById(puntoAcopioId).populate('zona_id');
       if (dbPoint && dbPoint.zona_id) {
         dbPoint.saturacion_ordinarios = saturation;
         dbPoint.accesibilidad_actual = accesibilidad;
+        if (volumenRaee !== undefined) dbPoint.saturacion_raee = volumenRaee;
+        if (typeof puntoEnEntornoSensible === 'boolean') dbPoint.entorno_sensible = puntoEnEntornoSensible;
+        if (typeof gestorDisponible === 'boolean') dbPoint.gestor_disponible = gestorDisponible;
         await dbPoint.save();
         await Zona.updateOne({ _id: dbPoint.zona_id._id }, { $set: { dias_sin_servicio: diasSinServicio } });
         punto = await PuntoAcopio.findById(puntoAcopioId).populate('zona_id').lean();
         zona = punto.zona_id;
         allPoints = await PuntoAcopio.find().populate('zona_id').lean();
         allEvents = await EventoContexto.find({ activo: true }).lean();
+        allVehicles = await Vehiculo.find().lean();
         if (vehiculoId && mongoose.isValidObjectId(vehiculoId)) {
-          const v = await Vehiculo.findById(vehiculoId).lean();
-          if (v) selectedVehicleType = v.tipo;
+          selectedVehicle = allVehicles.find((veh) => String(veh._id) === String(vehiculoId)) || null;
         }
       }
     }
@@ -341,27 +373,59 @@ async function handleInferenceEvaluation(req, res, next) {
       // Actualizar estado operativo del nodo y recalcular orden de ruta
       memPoint.saturacion_ordinarios = saturation;
       memPoint.accesibilidad_actual = accesibilidad;
+      if (volumenRaee !== undefined) memPoint.saturacion_raee = volumenRaee;
+      if (typeof puntoEnEntornoSensible === 'boolean') memPoint.entorno_sensible = puntoEnEntornoSensible;
+      if (typeof gestorDisponible === 'boolean') memPoint.gestor_disponible = gestorDisponible;
+      if (typeof tipoRaeeEsPeligroso === 'boolean') memPoint.raee_peligroso = tipoRaeeEsPeligroso;
       zona.dias_sin_servicio = diasSinServicio;
       punto = memPoint;
       allPoints = operationalStore.puntos;
       allEvents = operationalStore.eventos;
+      allVehicles = operationalStore.vehiculos;
       if (vehiculoId) {
-        const v = operationalStore.vehiculos.find((veh) => String(veh._id) === String(vehiculoId));
-        if (v) selectedVehicleType = v.tipo;
+        selectedVehicle = allVehicles.find((veh) => String(veh._id) === String(vehiculoId)) || null;
       }
     }
+
+    const selectedVehicleType = selectedVehicle?.tipo || 'Compactador';
+    const effectiveCapacityPct = capacidadRestantePct !== undefined
+      ? capacidadRestantePct
+      : (selectedVehicle?.capacidad_restante ?? 80);
+    const effectiveVolumenRaee = volumenRaee !== undefined
+      ? volumenRaee
+      : (punto.saturacion_raee ?? 0);
+    const effectiveGestorDisponible = typeof gestorDisponible === 'boolean'
+      ? gestorDisponible
+      : hasAvailableRaeeManager(allVehicles);
+    const effectiveTipoPeligroso = typeof tipoRaeeEsPeligroso === 'boolean'
+      ? tipoRaeeEsPeligroso
+      : isRaeeDangerous(punto.tipos_raee_acumulados);
 
     const eventsByZone = getEventsByZoneMap(allEvents);
     const zoneEvents = eventsByZone.get(String(zona._id)) || [];
     const context = deriveScenarioContext(zoneEvents, zona.sensibilidad_entorno, accesibilidad);
+    const effectiveEntornoSensible = typeof puntoEnEntornoSensible === 'boolean'
+      ? puntoEnEntornoSensible
+      : (typeof punto.entorno_sensible === 'boolean' ? punto.entorno_sensible : context.puntoEnEntornoSensible);
+
     const result = fuzzyPriority({
       saturation,
       sensitivity: context.sensitivity,
       daysWithoutService: diasSinServicio,
       accessibility: context.accessibility,
+      puntoEnEntornoSensible: effectiveEntornoSensible,
+      capacidadRestantePct: effectiveCapacityPct,
+      volumenRaee: effectiveVolumenRaee,
+      gestorDisponible: effectiveGestorDisponible,
+      tipoRaeeEsPeligroso: effectiveTipoPeligroso,
     });
 
-    const orderedStops = prioritizeRouteStops(allPoints, eventsByZone, selectedVehicleType);
+    const orderedStops = prioritizeRouteStops(
+      allPoints,
+      eventsByZone,
+      { tipo: selectedVehicleType, capacidad_restante: effectiveCapacityPct },
+      { gestorDisponible: effectiveGestorDisponible },
+    );
     const stopIndex = orderedStops.findIndex((stop) => String(stop.id) === String(punto._id));
 
     res.json({
@@ -382,6 +446,11 @@ async function handleInferenceEvaluation(req, res, next) {
         sensitivity: context.sensitivity,
         daysWithoutService: diasSinServicio,
         accessibility: result.accessibility,
+        puntoEnEntornoSensible: effectiveEntornoSensible,
+        capacidadRestantePct: effectiveCapacityPct,
+        volumenRaee: effectiveVolumenRaee,
+        gestorDisponible: effectiveGestorDisponible,
+        tipoRaeeEsPeligroso: effectiveTipoPeligroso,
       },
       context: {
         ...context,
@@ -401,7 +470,11 @@ app.post('/api/inferencia/evaluar', handleInferenceEvaluation);
 
 async function handleRouteCalculation(req, res, next) {
   try {
-    const { vehiculoId } = req.body || {};
+    const {
+      vehiculoId,
+      capacidadRestantePct,
+      gestorDisponible: gestorOverride,
+    } = req.body || {};
     if (!vehiculoId || !mongoose.isValidObjectId(vehiculoId)) {
       return apiError(res, 400, 'vehiculoId debe ser un identificador válido.');
     }
@@ -409,6 +482,7 @@ async function handleRouteCalculation(req, res, next) {
     let vehicle;
     let pointsList;
     let eventsList;
+    let vehiclesList = operationalStore.vehiculos;
 
     if (mongoose.connection.readyState === 1) {
       vehicle = await Vehiculo.findOne({ _id: vehiculoId, disponible: true }).lean();
@@ -421,6 +495,7 @@ async function handleRouteCalculation(req, res, next) {
           },
         }).limit(50).populate('zona_id').lean();
         eventsList = await EventoContexto.find({ activo: true }).lean();
+        vehiclesList = await Vehiculo.find().lean();
       }
     }
 
@@ -434,6 +509,7 @@ async function handleRouteCalculation(req, res, next) {
           - haversineMeters(vehicle.ubicacion_actual.coordinates, b.ubicacion.coordinates),
       );
       eventsList = operationalStore.eventos;
+      vehiclesList = operationalStore.vehiculos;
     }
 
     if (vehicle.capacidad_restante <= 0) {
@@ -441,7 +517,13 @@ async function handleRouteCalculation(req, res, next) {
     }
 
     const eventsByZone = getEventsByZoneMap(eventsList);
-    const rankedStops = prioritizeRouteStops(pointsList, eventsByZone, vehicle.tipo);
+    const gestorDisponible = typeof gestorOverride === 'boolean'
+      ? gestorOverride
+      : hasAvailableRaeeManager(vehiclesList);
+    const effectiveVehicle = Number.isFinite(capacidadRestantePct)
+      ? { ...vehicle, capacidad_restante: capacidadRestantePct }
+      : vehicle;
+    const rankedStops = prioritizeRouteStops(pointsList, eventsByZone, effectiveVehicle, { gestorDisponible });
 
     if (rankedStops.length === 0) {
       return res.json({

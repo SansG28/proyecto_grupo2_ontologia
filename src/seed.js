@@ -815,6 +815,26 @@ if (require.main === module) {
   });
 }
 
+const DANGEROUS_RAEE_KEYWORDS = [
+  'batería',
+  'bateria',
+  'celular',
+  'computador',
+  'tarjeta',
+  'bombilla',
+  'luminaria',
+  'transformador',
+  'acumulador',
+  'televisor',
+];
+
+function isRaeeTypeDangerous(raeeTypes = []) {
+  return raeeTypes.some((type) => {
+    const normalized = String(type || '').toLowerCase();
+    return DANGEROUS_RAEE_KEYWORDS.some((keyword) => normalized.includes(keyword));
+  });
+}
+
 module.exports = {
   zones,
   points,
@@ -822,5 +842,6 @@ module.exports = {
   contextEvents,
   routes,
   resolveBarrioToNode,
+  isRaeeTypeDangerous,
   seed,
 };

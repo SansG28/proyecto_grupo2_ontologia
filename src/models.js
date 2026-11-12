@@ -45,6 +45,8 @@ const puntoAcopioSchema = new mongoose.Schema({
   saturacion_raee: { type: Number, min: 0, max: 100, default: 0 },
   accesibilidad_actual: { type: String, enum: ['Buena', 'Regular', 'Mala'], default: 'Buena' },
   tipos_raee_acumulados: [{ type: String, trim: true }],
+  entorno_sensible: { type: Boolean, default: null },
+  gestor_disponible: { type: Boolean, default: true },
 }, { timestamps: true });
 puntoAcopioSchema.index({ ubicacion: '2dsphere' });
 puntoAcopioSchema.index({ nombre: 1 }, { unique: true });
