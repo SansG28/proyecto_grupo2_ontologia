@@ -58,6 +58,31 @@ app.get('/api/ontologia/resumen', (req, res, next) => {
   }
 });
 
+app.get('/api/ontologia/grafo', (req, res, next) => {
+  try {
+    const grafoPath = path.join(publicDirectory, 'grafo_villa_verde.json');
+    if (!fs.existsSync(grafoPath)) {
+      return apiError(res, 404, 'No se encontró el archivo del grafo ontológico.');
+    }
+    res.type('application/json');
+    res.sendFile(grafoPath);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get('/api/ontologia/grafo/descargar', (req, res, next) => {
+  try {
+    const grafoPath = path.join(publicDirectory, 'grafo_villa_verde.json');
+    if (!fs.existsSync(grafoPath)) {
+      return apiError(res, 404, 'No se encontró el archivo del grafo ontológico.');
+    }
+    res.download(grafoPath, 'grafo_villa_verde.json');
+  } catch (error) {
+    next(error);
+  }
+});
+
 function apiError(res, status, message) {
   return res.status(status).json({ error: message });
 }

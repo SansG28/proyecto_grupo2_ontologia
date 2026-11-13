@@ -1044,6 +1044,331 @@ async function initialize() {
   await runInference();
 }
 
+/* =========================================================================
+ * GESTIÓN Y RENDERIZADO DEL GRAFO ONTOLÓGICO INTERACTIVO (vis-network)
+ * ========================================================================= */
+let ontologyGraphData = null;
+let visNetworkInstance = null;
+let visNodesDataset = null;
+let visEdgesDataset = null;
+let currentOntologySubView = 'territorio';
+
+function getGraphNodeStyle(node) {
+  if (node.layer === 'T-Box') {
+    if (node.kind === 'root') {
+      return {
+        shape: 'diamond',
+        size: 24,
+        color: { background: '#64748b', border: '#cbd5e1' },
+        font: { color: '#f8fafc', size: 13, bold: true },
+      };
+    }
+    if (node.isDefined) {
+      return {
+        shape: 'box',
+        color: { background: '#78350f', border: '#f59e0b' },
+        font: { color: '#fef3c7', size: 12, bold: true },
+        borderWidth: 2,
+      };
+    }
+    return {
+      shape: 'box',
+      color: { background: '#1e3a8a', border: '#3b82f6' },
+      font: { color: '#dbeafe', size: 12 },
+    };
+  }
+
+  // A-Box Individuos
+  const hasInference = Array.isArray(node.hermitInferences) && node.hermitInferences.length > 0;
+  const isExcluded = node.assertedClass === 'CriterioExcluido';
+  const isAlert = node.domainGroup === 'EventosQuejas' || isExcluded || (node.hermitInferences && node.hermitInferences.includes('PuntoCritico'));
+
+  let bg = '#065f46';
+  let border = '#10b981';
+  if (node.domainGroup === 'Logistica') {
+    bg = '#581c87';
+    border = '#a855f7';
+  } else if (node.domainGroup === 'ResiduosRAEE') {
+    bg = '#155e75';
+    border = '#06b6d4';
+  } else if (node.domainGroup === 'Etiquetas') {
+    bg = '#334155';
+    border = '#94a3b8';
+  }
+
+  if (isAlert) {
+    bg = '#7f1d1d';
+    border = '#ef4444';
+  } else if (hasInference) {
+    bg = '#78350f';
+    border = '#f59e0b';
+  }
+
+  return {
+    shape: 'dot',
+    size: hasInference || isAlert ? 18 : 13,
+    color: { background: bg, border },
+    borderWidth: hasInference ? 3 : 2,
+    font: { color: '#f8fafc', size: 11 },
+  };
+}
+
+function renderOntologyGraph() {
+  if (!ontologyGraphData || !visNodesDataset || !visEdgesDataset) return;
+
+  const viewMode = document.getElementById('graph-view-mode')?.value || 'ALL';
+  const domainFilter = document.getElementById('graph-domain-filter')?.value || 'ALL';
+  const searchQuery = String(document.getElementById('graph-search-input')?.value || '').trim().toLowerCase();
+
+  const rawNodes = ontologyGraphData.graph?.nodes || [];
+  const rawEdges = ontologyGraphData.graph?.edges || [];
+
+  const filteredNodes = rawNodes.filter((n) => {
+    if (viewMode === 'TBOX' && n.layer !== 'T-Box') return false;
+    if (viewMode === 'ABOX' && n.layer !== 'A-Box') return false;
+    if (viewMode === 'INFERRED') {
+      const isInfClass = n.layer === 'T-Box' && n.isDefined;
+      const isInfInd = n.layer === 'A-Box' && n.hermitInferences && n.hermitInferences.length > 0;
+      if (!isInfClass && !isInfInd) return false;
+    }
+    if (domainFilter !== 'ALL' && n.layer === 'A-Box' && n.domainGroup !== domainFilter) return false;
+    if (searchQuery && !n.id.toLowerCase().includes(searchQuery) && !n.label.toLowerCase().includes(searchQuery)) return false;
+    return true;
+  });
+
+  const visibleIds = new Set(filteredNodes.map((n) => n.id));
+
+  const visNodes = filteredNodes.map((n) => ({
+    id: n.id,
+    label: n.label,
+    ...getGraphNodeStyle(n),
+    raw: n,
+  }));
+
+  const visEdges = rawEdges
+    .filter((e) => visibleIds.has(e.from) && visibleIds.has(e.to))
+    .map((e, idx) => {
+      let edgeColor = '#475569';
+      let edgeDashes = false;
+      if (e.type === 'hierarchy') {
+        edgeColor = '#3b82f6';
+      } else if (e.type === 'inference') {
+        edgeColor = '#f59e0b';
+        edgeDashes = true;
+      } else if (e.type === 'instantiation') {
+        edgeColor = '#64748b';
+        edgeDashes = [4, 4];
+      } else if (e.type === 'objectProperty') {
+        edgeColor = '#10b981';
+      }
+
+      return {
+        id: `e_${idx}`,
+        from: e.from,
+        to: e.to,
+        label: e.label,
+        arrows: 'to',
+        dashes: edgeDashes,
+        color: { color: edgeColor, opacity: 0.85 },
+        font: { color: '#94a3b8', size: 9, strokeWidth: 0, align: 'middle' },
+      };
+    });
+
+  visNodesDataset.clear();
+  visEdgesDataset.clear();
+  visNodesDataset.add(visNodes);
+  visEdgesDataset.add(visEdges);
+
+  const countBadge = document.getElementById('graph-nodes-count');
+  if (countBadge) {
+    countBadge.textContent = `${visNodes.length} nodos visibles · ${visEdges.length} relaciones`;
+  }
+}
+
+function inspectOntologyNode(nodeId) {
+  if (!ontologyGraphData?.graph?.nodes) return;
+  const nodeObj = ontologyGraphData.graph.nodes.find((n) => n.id === nodeId);
+  if (!nodeObj) return;
+
+  const inspector = document.getElementById('ontology-inspector');
+  if (!inspector) return;
+
+  if (nodeObj.layer === 'T-Box') {
+    const d = nodeObj.details || {};
+    inspector.innerHTML = `
+      <div class="border-b border-gray-700 pb-3 mb-4">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/30 px-2.5 py-1 rounded-md">T-Box (Clase OWL)</span>
+        <h3 class="text-base font-bold text-white mt-2">${nodeObj.id}</h3>
+        <div class="tag-row mt-2">
+          ${nodeObj.isDefined ? '<span class="tag tag-hermit">⚡ Clase Equivalente (HermiT)</span>' : '<span class="tag">Clase Primitiva</span>'}
+        </div>
+      </div>
+      <table class="w-full text-xs text-left">
+        <tr class="border-b border-gray-800"><td class="py-2 text-gray-400 font-medium">Etiqueta</td><td class="py-2 text-white">${nodeObj.label}</td></tr>
+        <tr class="border-b border-gray-800"><td class="py-2 text-gray-400 font-medium">Superclase</td><td class="py-2 text-cyan-300 font-mono">${d.parent || 'owl:Thing'}</td></tr>
+        ${d.axiom ? `<tr><td class="py-2 text-gray-400 font-medium">Axioma Lógico</td><td class="py-2 text-amber-300 font-mono font-semibold">${d.axiom}</td></tr>` : ''}
+      </table>
+    `;
+    return;
+  }
+
+  const ind = nodeObj.details || {};
+  const dPropsEntries = Object.entries(ind.dataProperties || {});
+  const oPropsList = ind.objectProperties || [];
+
+  let badgesHtml = `<span class="tag">${ind.assertedClass || 'Thing'}</span>`;
+  (ind.hermitInferences || []).forEach((inf) => {
+    const cls = inf === 'PuntoCritico' ? 'tag tag-alert' : 'tag tag-hermit';
+    badgesHtml += `<span class="${cls}">⚡ Inferido: ${inf}</span>`;
+  });
+  if (ind.assertedClass === 'CriterioExcluido') {
+    badgesHtml += '<span class="tag tag-alert">🚫 Excluido por Sesgo</span>';
+  }
+
+  const dPropsHtml = dPropsEntries.length
+    ? `<table class="w-full text-xs text-left">${dPropsEntries.map(([k, v]) => `<tr class="border-b border-gray-800/80"><td class="py-1 text-gray-400">${k}</td><td class="py-1 text-white font-mono text-right">${v}</td></tr>`).join('')}</table>`
+    : '<p class="text-xs text-gray-500 italic mt-1">Sin Data Properties asignadas.</p>';
+
+  const oPropsHtml = oPropsList.length
+    ? oPropsList.map((r) => `<div class="rel-item"><span class="rel-prop">${r.property}</span><span class="text-gray-300">→ ${r.target}</span></div>`).join('')
+    : '<p class="text-xs text-gray-500 italic mt-1">Sin Object Properties salientes.</p>';
+
+  inspector.innerHTML = `
+    <div class="border-b border-gray-700 pb-3 mb-4">
+      <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-md">A-Box (Individuo)</span>
+      <h3 class="text-base font-bold text-white mt-2">${ind.id || nodeObj.id}</h3>
+      <div class="tag-row mt-2">${badgesHtml}</div>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <div class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Propiedades de Datos (Data Properties)</div>
+        ${dPropsHtml}
+      </div>
+      <div>
+        <div class="text-[10px] uppercase font-bold text-gray-400 mb-1 tracking-wider">Relaciones Semánticas (Object Properties)</div>
+        ${oPropsHtml}
+      </div>
+    </div>
+  `;
+}
+
+async function loadAndRenderOntologyGraph() {
+  try {
+    const response = await fetch('/api/ontologia/grafo');
+    if (!response.ok) {
+      throw new Error(`Error HTTP: ${response.status}`);
+    }
+    ontologyGraphData = await response.json();
+
+    // Actualizar métricas ontológicas
+    const m = ontologyGraphData.metadata?.metrics;
+    if (m) {
+      const clsEl = document.getElementById('metric-classes');
+      const indEl = document.getElementById('metric-individuals');
+      const opEl = document.getElementById('metric-object-props');
+      const dpEl = document.getElementById('metric-data-props');
+      if (clsEl) clsEl.textContent = m.classes;
+      if (indEl) indEl.textContent = m.individuals;
+      if (opEl) opEl.textContent = m.objectProperties;
+      if (dpEl) dpEl.textContent = m.dataProperties;
+    }
+
+    const container = document.getElementById('mynetwork');
+    if (!container || !window.vis) return;
+
+    visNodesDataset = new vis.DataSet();
+    visEdgesDataset = new vis.DataSet();
+
+    const options = {
+      physics: {
+        enabled: true,
+        barnesHut: {
+          gravitationalConstant: -3500,
+          centralGravity: 0.25,
+          springLength: 130,
+          springConstant: 0.04,
+        },
+        stabilization: { iterations: 150 },
+      },
+      interaction: { hover: true, tooltipDelay: 150 },
+    };
+
+    visNetworkInstance = new vis.Network(container, { nodes: visNodesDataset, edges: visEdgesDataset }, options);
+
+    visNetworkInstance.on('click', (params) => {
+      if (params.nodes && params.nodes.length > 0) {
+        inspectOntologyNode(params.nodes[0]);
+      }
+    });
+
+    // Escuchadores de eventos para los filtros
+    document.getElementById('graph-view-mode')?.addEventListener('change', renderOntologyGraph);
+    document.getElementById('graph-domain-filter')?.addEventListener('change', renderOntologyGraph);
+    document.getElementById('graph-search-input')?.addEventListener('input', renderOntologyGraph);
+    document.getElementById('btn-graph-fit')?.addEventListener('click', () => {
+      if (visNetworkInstance) visNetworkInstance.fit({ animation: true });
+    });
+
+    renderOntologyGraph();
+  } catch (error) {
+    console.warn('No se pudo cargar el grafo ontológico desde la API:', error);
+  }
+}
+
+function switchOntologySubView(subView) {
+  currentOntologySubView = subView;
+  const viewTerritorio = document.getElementById('subview-territorio');
+  const viewGrafo = document.getElementById('subview-grafo');
+  const btnTerritorio = document.getElementById('btn-subview-territorio');
+  const btnGrafo = document.getElementById('btn-subview-grafo');
+
+  if (subView === 'territorio') {
+    if (viewTerritorio) viewTerritorio.classList.remove('hidden');
+    if (viewGrafo) viewGrafo.classList.add('hidden');
+    if (btnTerritorio) {
+      btnTerritorio.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
+      btnTerritorio.classList.remove('text-gray-400');
+    }
+    if (btnGrafo) {
+      btnGrafo.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm');
+      btnGrafo.classList.add('text-gray-400');
+    }
+    if (map) setTimeout(() => map.resize(), 100);
+  } else if (subView === 'grafo') {
+    if (viewTerritorio) viewTerritorio.classList.add('hidden');
+    if (viewGrafo) viewGrafo.classList.remove('hidden');
+    if (btnGrafo) {
+      btnGrafo.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
+      btnGrafo.classList.remove('text-gray-400');
+    }
+    if (btnTerritorio) {
+      btnTerritorio.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm');
+      btnTerritorio.classList.add('text-gray-400');
+    }
+    if (!ontologyGraphData) {
+      loadAndRenderOntologyGraph();
+    } else if (visNetworkInstance) {
+      setTimeout(() => visNetworkInstance.fit({ animation: true }), 100);
+    }
+  }
+}
+
+function exportKnowledgeGraphJSON() {
+  if (ontologyGraphData) {
+    const blob = new Blob([JSON.stringify(ontologyGraphData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'grafo_villa_verde.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } else {
+    window.location.href = '/api/ontologia/grafo/descargar';
+  }
+}
+
 function switchTab(tabId) {
   document.querySelectorAll('.tab-content').forEach((element) => element.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach((element) => {
@@ -1054,8 +1379,13 @@ function switchTab(tabId) {
   const activeButton = document.getElementById(`btn-tab-${tabId}`);
   activeButton.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
   activeButton.classList.remove('text-gray-400');
-  if (tabId === 'ontologia' && map) map.resize();
+  if (tabId === 'ontologia') {
+    if (currentOntologySubView === 'territorio' && map) map.resize();
+    if (currentOntologySubView === 'grafo' && visNetworkInstance) visNetworkInstance.fit({ animation: true });
+  }
 }
 
+window.switchOntologySubView = switchOntologySubView;
+window.exportKnowledgeGraphJSON = exportKnowledgeGraphJSON;
 window.switchTab = switchTab;
 initialize();

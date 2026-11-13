@@ -1,0 +1,4349 @@
+{
+  "metadata": {
+    "ontologyIRI": "http://www.semanticweb.org/ontologies/2026/villa_verde",
+    "version": "v2",
+    "reasoner": "HermiT (0 inconsistencias)",
+    "metrics": {
+      "classes": 37,
+      "objectProperties": 11,
+      "dataProperties": 20,
+      "individuals": 46,
+      "totalNodes": 84,
+      "totalEdges": 139
+    }
+  },
+  "tbox": {
+    "classes": [
+      {
+        "id": "Residuo",
+        "label": "Residuo",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "ResiduoOrdinario",
+        "label": "Residuo Ordinario",
+        "parent": "Residuo",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "ResiduoRAEE",
+        "label": "Residuo RAEE",
+        "parent": "Residuo",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "TipoRAEE",
+        "label": "Tipo RAEE",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "TipoRAEEPeligroso",
+        "label": "Tipo RAEE Peligroso",
+        "parent": "TipoRAEE",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Zona",
+        "label": "Zona",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "ComunaUrbana",
+        "label": "Comuna Urbana",
+        "parent": "Zona",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Corregimiento",
+        "label": "Corregimiento",
+        "parent": "Zona",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Vereda",
+        "label": "Vereda",
+        "parent": "Zona",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "ZonaDesatendida",
+        "label": "Zona desatendida",
+        "parent": "Zona",
+        "isDefined": true,
+        "axiom": "Zona ⊓ (diasSinServicio >= 7)"
+      },
+      {
+        "id": "ZonaVulnerable",
+        "label": "Zona vulnerable",
+        "parent": "Zona",
+        "isDefined": true,
+        "axiom": "Zona ⊓ (porcentajeVulnerable >= 25.0)"
+      },
+      {
+        "id": "PuntoAcopio",
+        "label": "Punto de acopio",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "ContenedorOrdinario",
+        "label": "Contenedor Ordinario",
+        "parent": "PuntoAcopio",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "PuntoAcopioRAEE",
+        "label": "Punto Acopio RAEE",
+        "parent": "PuntoAcopio",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "PuntoSaturado",
+        "label": "Punto saturado",
+        "parent": "PuntoAcopio",
+        "isDefined": true,
+        "axiom": "PuntoAcopio ⊓ (porcentajeSaturacion >= 80)"
+      },
+      {
+        "id": "PuntoEnEntornoSensible",
+        "label": "Punto en Entorno Sensible",
+        "parent": "PuntoAcopio",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "PuntoCritico",
+        "label": "Punto crítico",
+        "parent": "PuntoAcopio",
+        "isDefined": true,
+        "axiom": "PuntoSaturado ⊓ (∃ cercaDe.EquipamientoSensible)"
+      },
+      {
+        "id": "Ruta",
+        "label": "Ruta",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Vehiculo",
+        "label": "Vehículo",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "CamionCompactador",
+        "label": "Camión Compactador",
+        "parent": "Vehiculo",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Volqueta",
+        "label": "Volqueta",
+        "parent": "Vehiculo",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Gestor",
+        "label": "Gestor",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "GestorAutorizado",
+        "label": "Gestor Autorizado",
+        "parent": "Gestor",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "EventoClimatico",
+        "label": "Evento climático",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Lluvia",
+        "label": "Lluvia",
+        "parent": "EventoClimatico",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "QuejaCiudadana",
+        "label": "Queja ciudadana",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "EquipamientoSensible",
+        "label": "Equipamiento sensible",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Colegio",
+        "label": "Colegio",
+        "parent": "EquipamientoSensible",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "CentroSalud",
+        "label": "Centro de Salud",
+        "parent": "EquipamientoSensible",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "EtiquetaLinguistica",
+        "label": "Etiqueta lingüística",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Criticidad",
+        "label": "Criticidad",
+        "parent": "EtiquetaLinguistica",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "NivelAccesibilidad",
+        "label": "Nivel de Accesibilidad",
+        "parent": "EtiquetaLinguistica",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "DecisionPriorizacion",
+        "label": "Decisión de priorización",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "Recomendacion",
+        "label": "Recomendación",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "CriterioPriorizacion",
+        "label": "Criterio de priorización",
+        "parent": "owl:Thing",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "CriterioLegitimo",
+        "label": "Criterio Legítimo",
+        "parent": "CriterioPriorizacion",
+        "isDefined": false,
+        "axiom": null
+      },
+      {
+        "id": "CriterioExcluido",
+        "label": "Criterio Excluido",
+        "parent": "CriterioPriorizacion",
+        "isDefined": false,
+        "axiom": null
+      }
+    ],
+    "objectProperties": [
+      {
+        "id": "ubicadoEn",
+        "label": "ubicado en",
+        "domain": "PuntoAcopio",
+        "range": "Zona"
+      },
+      {
+        "id": "cubreZona",
+        "label": "cubre zona",
+        "domain": "Ruta",
+        "range": "Zona"
+      },
+      {
+        "id": "atiendePunto",
+        "label": "atiende punto",
+        "domain": "Ruta",
+        "range": "PuntoAcopio"
+      },
+      {
+        "id": "asignadaA",
+        "label": "asignada a",
+        "domain": "Ruta",
+        "range": "Vehiculo"
+      },
+      {
+        "id": "cercaDe",
+        "label": "cerca de",
+        "domain": "PuntoAcopio",
+        "range": "EquipamientoSensible"
+      },
+      {
+        "id": "reportadaEn",
+        "label": "reportada en",
+        "domain": "QuejaCiudadana",
+        "range": "Zona"
+      },
+      {
+        "id": "afectaZona",
+        "label": "afecta zona",
+        "domain": "EventoClimatico",
+        "range": "Zona"
+      },
+      {
+        "id": "recibeTipo",
+        "label": "recibe tipo",
+        "domain": "PuntoAcopio",
+        "range": "TipoRAEE"
+      },
+      {
+        "id": "gestionadoPor",
+        "label": "gestionado por",
+        "domain": "PuntoAcopioRAEE",
+        "range": "Gestor"
+      },
+      {
+        "id": "tieneCriticidad",
+        "label": "tiene criticidad",
+        "domain": "Thing",
+        "range": "Criticidad"
+      },
+      {
+        "id": "tienePrioridad",
+        "label": "tiene prioridad",
+        "domain": "DecisionPriorizacion",
+        "range": "Criticidad"
+      }
+    ],
+    "dataProperties": [
+      {
+        "id": "porcentajeSaturacion",
+        "label": "porcentaje saturación",
+        "domain": "PuntoAcopio",
+        "range": "integer"
+      },
+      {
+        "id": "saturacionOrdinarios",
+        "label": "saturacionOrdinarios",
+        "domain": "PuntoAcopio",
+        "range": "integer"
+      },
+      {
+        "id": "saturacionRAEE",
+        "label": "saturacionRAEE",
+        "domain": "PuntoAcopio",
+        "range": "integer"
+      },
+      {
+        "id": "diasSinServicio",
+        "label": "días sin servicio",
+        "domain": "Zona",
+        "range": "integer"
+      },
+      {
+        "id": "sensibilidadEntorno",
+        "label": "sensibilidadEntorno",
+        "domain": "Zona",
+        "range": "integer"
+      },
+      {
+        "id": "demandaEsperada",
+        "label": "demandaEsperada",
+        "domain": "Zona",
+        "range": "integer"
+      },
+      {
+        "id": "volumenRAEEkg",
+        "label": "volumenRAEEkg",
+        "domain": "PuntoAcopioRAEE",
+        "range": "decimal"
+      },
+      {
+        "id": "capacidadRestantePct",
+        "label": "capacidadRestantePct",
+        "domain": "Vehiculo",
+        "range": "integer"
+      },
+      {
+        "id": "latitud",
+        "label": "latitud",
+        "domain": "Thing",
+        "range": "decimal"
+      },
+      {
+        "id": "longitud",
+        "label": "longitud",
+        "domain": "Thing",
+        "range": "decimal"
+      },
+      {
+        "id": "poblacionVulnerable",
+        "label": "poblacionVulnerable",
+        "domain": "Zona",
+        "range": "integer"
+      },
+      {
+        "id": "porcentajeVulnerable",
+        "label": "porcentajeVulnerable",
+        "domain": "Zona",
+        "range": "decimal"
+      },
+      {
+        "id": "severidad",
+        "label": "severidad",
+        "domain": "Thing",
+        "range": "integer"
+      },
+      {
+        "id": "estadoVia",
+        "label": "estadoVia",
+        "domain": "Thing",
+        "range": "string"
+      },
+      {
+        "id": "afectaPoblacionVulnerable",
+        "label": "afectaPoblacionVulnerable",
+        "domain": "QuejaCiudadana",
+        "range": "boolean"
+      },
+      {
+        "id": "esPeligroso",
+        "label": "esPeligroso",
+        "domain": "TipoRAEE",
+        "range": "boolean"
+      },
+      {
+        "id": "disponible",
+        "label": "disponible",
+        "domain": "Gestor",
+        "range": "boolean"
+      },
+      {
+        "id": "estaAutorizado",
+        "label": "estaAutorizado",
+        "domain": "Gestor",
+        "range": "boolean"
+      },
+      {
+        "id": "esLegitimo",
+        "label": "esLegitimo",
+        "domain": "CriterioPriorizacion",
+        "range": "boolean"
+      },
+      {
+        "id": "descripcion",
+        "label": "descripcion",
+        "domain": "Thing",
+        "range": "string"
+      }
+    ]
+  },
+  "abox": {
+    "individuals": [
+      {
+        "id": "Criticidad_Baja",
+        "label": "Criticidad Baja",
+        "assertedClass": "Criticidad",
+        "inferredClasses": [
+          "Criticidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "Criticidad_Media",
+        "label": "Criticidad Media",
+        "assertedClass": "Criticidad",
+        "inferredClasses": [
+          "Criticidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "Criticidad_Alta",
+        "label": "Criticidad Alta",
+        "assertedClass": "Criticidad",
+        "inferredClasses": [
+          "Criticidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "Criticidad_Critica",
+        "label": "Criticidad Critica",
+        "assertedClass": "Criticidad",
+        "inferredClasses": [
+          "Criticidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "NivelAccesibilidad_Buena",
+        "label": "NivelAccesibilidad Buena",
+        "assertedClass": "NivelAccesibilidad",
+        "inferredClasses": [
+          "NivelAccesibilidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "NivelAccesibilidad_Regular",
+        "label": "NivelAccesibilidad Regular",
+        "assertedClass": "NivelAccesibilidad",
+        "inferredClasses": [
+          "NivelAccesibilidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "NivelAccesibilidad_Mala",
+        "label": "NivelAccesibilidad Mala",
+        "assertedClass": "NivelAccesibilidad",
+        "inferredClasses": [
+          "NivelAccesibilidad",
+          "EtiquetaLinguistica"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etiquetas",
+        "dataProperties": {},
+        "objectProperties": []
+      },
+      {
+        "id": "Gestor_EcoRAEE",
+        "label": "Gestor EcoRAEE",
+        "assertedClass": "GestorAutorizado",
+        "inferredClasses": [
+          "GestorAutorizado",
+          "Gestor"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "disponible": true,
+          "estaAutorizado": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Gestor_RecuperaTech",
+        "label": "Gestor RecuperaTech",
+        "assertedClass": "GestorAutorizado",
+        "inferredClasses": [
+          "GestorAutorizado",
+          "Gestor"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "disponible": true,
+          "estaAutorizado": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Comuna_1_Centro",
+        "label": "Zona Comuna 1 Centro",
+        "assertedClass": "ComunaUrbana",
+        "inferredClasses": [
+          "ComunaUrbana",
+          "Zona",
+          "ZonaVulnerable"
+        ],
+        "hermitInferences": [
+          "ZonaVulnerable"
+        ],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.65,
+          "longitud": -74.08,
+          "sensibilidadEntorno": 82,
+          "diasSinServicio": 1,
+          "demandaEsperada": 740,
+          "poblacionVulnerable": 2940,
+          "porcentajeVulnerable": 30.0
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Comuna_2_Norte",
+        "label": "Zona Comuna 2 Norte",
+        "assertedClass": "ComunaUrbana",
+        "inferredClasses": [
+          "ComunaUrbana",
+          "Zona"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.685,
+          "longitud": -74.055,
+          "sensibilidadEntorno": 42,
+          "diasSinServicio": 2,
+          "demandaEsperada": 510
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Comuna_3_Parque",
+        "label": "Zona Comuna 3 Parque",
+        "assertedClass": "ComunaUrbana",
+        "inferredClasses": [
+          "ComunaUrbana",
+          "Zona"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.668,
+          "longitud": -74.1,
+          "sensibilidadEntorno": 90,
+          "diasSinServicio": 1,
+          "demandaEsperada": 620
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Comuna_4_Industrial",
+        "label": "Zona Comuna 4 Industrial",
+        "assertedClass": "ComunaUrbana",
+        "inferredClasses": [
+          "ComunaUrbana",
+          "Zona"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.63,
+          "longitud": -74.04,
+          "sensibilidadEntorno": 35,
+          "diasSinServicio": 3,
+          "demandaEsperada": 460
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Vereda_El_Encanto",
+        "label": "Zona Vereda El Encanto",
+        "assertedClass": "Vereda",
+        "inferredClasses": [
+          "Vereda",
+          "Zona",
+          "ZonaVulnerable",
+          "ZonaDesatendida"
+        ],
+        "hermitInferences": [
+          "ZonaVulnerable",
+          "ZonaDesatendida"
+        ],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.695,
+          "longitud": -74.135,
+          "sensibilidadEntorno": 68,
+          "diasSinServicio": 9,
+          "demandaEsperada": 90,
+          "poblacionVulnerable": 180,
+          "porcentajeVulnerable": 28.1
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Vereda_Alto_Verde",
+        "label": "Zona Vereda Alto Verde",
+        "assertedClass": "Vereda",
+        "inferredClasses": [
+          "Vereda",
+          "Zona"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.61,
+          "longitud": -74.14,
+          "sensibilidadEntorno": 52,
+          "diasSinServicio": 5,
+          "demandaEsperada": 75
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Zona_Corregimiento_La_Esperanza",
+        "label": "Zona Corregimiento La Esperanza",
+        "assertedClass": "Corregimiento",
+        "inferredClasses": [
+          "Corregimiento",
+          "Zona"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Zonas",
+        "dataProperties": {
+          "latitud": 4.69,
+          "longitud": -74.02,
+          "sensibilidadEntorno": 58,
+          "diasSinServicio": 4,
+          "demandaEsperada": 130
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Colegio_San_Jose",
+        "label": "Colegio San Jose",
+        "assertedClass": "Colegio",
+        "inferredClasses": [
+          "Colegio",
+          "EquipamientoSensible"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {},
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Comuna_3_Parque"
+          }
+        ]
+      },
+      {
+        "id": "RAEE_Baterias",
+        "label": "RAEE Baterias",
+        "assertedClass": "TipoRAEEPeligroso",
+        "inferredClasses": [
+          "TipoRAEEPeligroso",
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "RAEE_Celulares",
+        "label": "RAEE Celulares",
+        "assertedClass": "TipoRAEE",
+        "inferredClasses": [
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "RAEE_Electrodomesticos",
+        "label": "RAEE Electrodomesticos",
+        "assertedClass": "TipoRAEE",
+        "inferredClasses": [
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": false
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "RAEE_Cables",
+        "label": "RAEE Cables",
+        "assertedClass": "TipoRAEE",
+        "inferredClasses": [
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": false
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "RAEE_Tarjetas",
+        "label": "RAEE Tarjetas",
+        "assertedClass": "TipoRAEE",
+        "inferredClasses": [
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "RAEE_Bombillas",
+        "label": "RAEE Bombillas",
+        "assertedClass": "TipoRAEE",
+        "inferredClasses": [
+          "TipoRAEE"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "ResiduosRAEE",
+        "dataProperties": {
+          "esPeligroso": true
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Acopio_Central",
+        "label": "Acopio Central",
+        "assertedClass": "PuntoAcopioRAEE",
+        "inferredClasses": [
+          "PuntoAcopioRAEE",
+          "PuntoAcopio",
+          "PuntoSaturado",
+          "PuntoCritico"
+        ],
+        "hermitInferences": [
+          "PuntoSaturado",
+          "PuntoCritico"
+        ],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.666,
+          "longitud": -74.098,
+          "saturacionOrdinarios": 85,
+          "porcentajeSaturacion": 85,
+          "saturacionRAEE": 64
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Comuna_3_Parque"
+          },
+          {
+            "property": "cercaDe",
+            "target": "Colegio_San_Jose"
+          },
+          {
+            "property": "gestionadoPor",
+            "target": "Gestor_EcoRAEE"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Baterias"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Celulares"
+          }
+        ]
+      },
+      {
+        "id": "Acopio_Norte",
+        "label": "Acopio Norte",
+        "assertedClass": "PuntoAcopioRAEE",
+        "inferredClasses": [
+          "PuntoAcopioRAEE",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.683,
+          "longitud": -74.057,
+          "saturacionOrdinarios": 44,
+          "porcentajeSaturacion": 44,
+          "saturacionRAEE": 25
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Comuna_2_Norte"
+          },
+          {
+            "property": "gestionadoPor",
+            "target": "Gestor_EcoRAEE"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Electrodomesticos"
+          }
+        ]
+      },
+      {
+        "id": "Acopio_Centro",
+        "label": "Acopio Centro",
+        "assertedClass": "PuntoAcopioRAEE",
+        "inferredClasses": [
+          "PuntoAcopioRAEE",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.644,
+          "longitud": -74.078,
+          "saturacionOrdinarios": 68,
+          "porcentajeSaturacion": 68,
+          "saturacionRAEE": 38
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Comuna_1_Centro"
+          },
+          {
+            "property": "gestionadoPor",
+            "target": "Gestor_RecuperaTech"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Cables"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Celulares"
+          }
+        ]
+      },
+      {
+        "id": "Acopio_Industrial",
+        "label": "Acopio Industrial",
+        "assertedClass": "PuntoAcopioRAEE",
+        "inferredClasses": [
+          "PuntoAcopioRAEE",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.632,
+          "longitud": -74.037,
+          "saturacionOrdinarios": 57,
+          "porcentajeSaturacion": 57,
+          "saturacionRAEE": 71
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Comuna_4_Industrial"
+          },
+          {
+            "property": "gestionadoPor",
+            "target": "Gestor_RecuperaTech"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Tarjetas"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Cables"
+          }
+        ]
+      },
+      {
+        "id": "Punto_El_Encanto",
+        "label": "Punto El Encanto",
+        "assertedClass": "ContenedorOrdinario",
+        "inferredClasses": [
+          "ContenedorOrdinario",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.692,
+          "longitud": -74.132,
+          "saturacionOrdinarios": 72,
+          "porcentajeSaturacion": 72,
+          "saturacionRAEE": 30
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Vereda_El_Encanto"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Baterias"
+          }
+        ]
+      },
+      {
+        "id": "Punto_Alto_Verde",
+        "label": "Punto Alto Verde",
+        "assertedClass": "ContenedorOrdinario",
+        "inferredClasses": [
+          "ContenedorOrdinario",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.612,
+          "longitud": -74.137,
+          "saturacionOrdinarios": 36,
+          "porcentajeSaturacion": 36,
+          "saturacionRAEE": 20
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Vereda_Alto_Verde"
+          }
+        ]
+      },
+      {
+        "id": "Punto_La_Esperanza",
+        "label": "Punto La Esperanza",
+        "assertedClass": "ContenedorOrdinario",
+        "inferredClasses": [
+          "ContenedorOrdinario",
+          "PuntoAcopio"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "PuntosAcopio",
+        "dataProperties": {
+          "latitud": 4.688,
+          "longitud": -74.023,
+          "saturacionOrdinarios": 61,
+          "porcentajeSaturacion": 61,
+          "saturacionRAEE": 48
+        },
+        "objectProperties": [
+          {
+            "property": "ubicadoEn",
+            "target": "Zona_Corregimiento_La_Esperanza"
+          },
+          {
+            "property": "recibeTipo",
+            "target": "RAEE_Bombillas"
+          }
+        ]
+      },
+      {
+        "id": "Vehiculo_Compactador_01",
+        "label": "Vehiculo Compactador 01",
+        "assertedClass": "CamionCompactador",
+        "inferredClasses": [
+          "CamionCompactador",
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 72,
+          "disponible": true,
+          "latitud": 4.656,
+          "longitud": -74.088
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Vehiculo_Compactador_02",
+        "label": "Vehiculo Compactador 02",
+        "assertedClass": "CamionCompactador",
+        "inferredClasses": [
+          "CamionCompactador",
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 60,
+          "disponible": true,
+          "latitud": 4.662,
+          "longitud": -74.068
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Vehiculo_Compactador_03",
+        "label": "Vehiculo Compactador 03",
+        "assertedClass": "CamionCompactador",
+        "inferredClasses": [
+          "CamionCompactador",
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 0,
+          "disponible": false,
+          "latitud": 4.645,
+          "longitud": -74.05
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Vehiculo_Volqueta_04",
+        "label": "Vehiculo Volqueta 04",
+        "assertedClass": "Volqueta",
+        "inferredClasses": [
+          "Volqueta",
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 78,
+          "disponible": true,
+          "latitud": 4.642,
+          "longitud": -74.115
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Vehiculo_Volqueta_05",
+        "label": "Vehiculo Volqueta 05",
+        "assertedClass": "Volqueta",
+        "inferredClasses": [
+          "Volqueta",
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 65,
+          "disponible": true,
+          "latitud": 4.68,
+          "longitud": -74.125
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Vehiculo_Gestor_RAEE_06",
+        "label": "Vehiculo Gestor RAEE 06",
+        "assertedClass": "Vehiculo",
+        "inferredClasses": [
+          "Vehiculo"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {
+          "capacidadRestantePct": 90,
+          "disponible": true,
+          "latitud": 4.678,
+          "longitud": -74.045
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "EventoClimatico_E1",
+        "label": "EventoClimatico E1",
+        "assertedClass": "Lluvia",
+        "inferredClasses": [
+          "Lluvia",
+          "EventoClimatico"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "EventosQuejas",
+        "dataProperties": {
+          "severidad": 3,
+          "estadoVia": "Regular",
+          "descripcion": "Lluvia registrada para el escenario E1"
+        },
+        "objectProperties": [
+          {
+            "property": "afectaZona",
+            "target": "Zona_Vereda_El_Encanto"
+          }
+        ]
+      },
+      {
+        "id": "QuejaCiudadana_E2",
+        "label": "QuejaCiudadana E2",
+        "assertedClass": "QuejaCiudadana",
+        "inferredClasses": [
+          "QuejaCiudadana"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "EventosQuejas",
+        "dataProperties": {
+          "severidad": 5,
+          "afectaPoblacionVulnerable": false,
+          "descripcion": "Reporte sintético de quema de cables para el escenario E2"
+        },
+        "objectProperties": [
+          {
+            "property": "reportadaEn",
+            "target": "Zona_Comuna_4_Industrial"
+          }
+        ]
+      },
+      {
+        "id": "Ruta_Urgente_Urbana_01",
+        "label": "Ruta Urgente Urbana 01",
+        "assertedClass": "Ruta",
+        "inferredClasses": [
+          "Ruta"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {},
+        "objectProperties": [
+          {
+            "property": "asignadaA",
+            "target": "Vehiculo_Compactador_01"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Central"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Centro"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Industrial"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Norte"
+          },
+          {
+            "property": "cubreZona",
+            "target": "Zona_Comuna_3_Parque"
+          },
+          {
+            "property": "cubreZona",
+            "target": "Zona_Comuna_1_Centro"
+          }
+        ]
+      },
+      {
+        "id": "Ruta_Equidad_Rural_01",
+        "label": "Ruta Equidad Rural 01",
+        "assertedClass": "Ruta",
+        "inferredClasses": [
+          "Ruta"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {},
+        "objectProperties": [
+          {
+            "property": "asignadaA",
+            "target": "Vehiculo_Volqueta_05"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Punto_El_Encanto"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Punto_La_Esperanza"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Punto_Alto_Verde"
+          },
+          {
+            "property": "cubreZona",
+            "target": "Zona_Vereda_El_Encanto"
+          }
+        ]
+      },
+      {
+        "id": "Ruta_Especial_RAEE_01",
+        "label": "Ruta Especial RAEE 01",
+        "assertedClass": "Ruta",
+        "inferredClasses": [
+          "Ruta"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Logistica",
+        "dataProperties": {},
+        "objectProperties": [
+          {
+            "property": "asignadaA",
+            "target": "Vehiculo_Gestor_RAEE_06"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Industrial"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Punto_El_Encanto"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Acopio_Central"
+          },
+          {
+            "property": "atiendePunto",
+            "target": "Punto_La_Esperanza"
+          }
+        ]
+      },
+      {
+        "id": "Criterio_Saturacion",
+        "label": "Criterio Saturacion",
+        "assertedClass": "CriterioLegitimo",
+        "inferredClasses": [
+          "CriterioLegitimo",
+          "CriterioPriorizacion"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etica",
+        "dataProperties": {
+          "esLegitimo": true,
+          "descripcion": "Nivel de llenado o rebosamiento de contenedores"
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Criterio_SensibilidadEntorno",
+        "label": "Criterio SensibilidadEntorno",
+        "assertedClass": "CriterioLegitimo",
+        "inferredClasses": [
+          "CriterioLegitimo",
+          "CriterioPriorizacion"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etica",
+        "dataProperties": {
+          "esLegitimo": true,
+          "descripcion": "Cercanía a colegios, centros de salud o fuentes de agua"
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Criterio_DiasSinServicio",
+        "label": "Criterio DiasSinServicio",
+        "assertedClass": "CriterioLegitimo",
+        "inferredClasses": [
+          "CriterioLegitimo",
+          "CriterioPriorizacion"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etica",
+        "dataProperties": {
+          "esLegitimo": true,
+          "descripcion": "Días acumulados sin atención para garantizar equidad territorial"
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Criterio_RelacionesPersonales",
+        "label": "Criterio RelacionesPersonales",
+        "assertedClass": "CriterioExcluido",
+        "inferredClasses": [
+          "CriterioExcluido",
+          "CriterioPriorizacion"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etica",
+        "dataProperties": {
+          "esLegitimo": false,
+          "descripcion": "Favoritismo por conocidos del operario (excluido por sesgo)"
+        },
+        "objectProperties": []
+      },
+      {
+        "id": "Criterio_VisibilidadPolitica",
+        "label": "Criterio VisibilidadPolitica",
+        "assertedClass": "CriterioExcluido",
+        "inferredClasses": [
+          "CriterioExcluido",
+          "CriterioPriorizacion"
+        ],
+        "hermitInferences": [],
+        "domainGroup": "Etica",
+        "dataProperties": {
+          "esLegitimo": false,
+          "descripcion": "Priorización por visitas institucionales o politiqueras (excluido por sesgo)"
+        },
+        "objectProperties": []
+      }
+    ]
+  },
+  "graph": {
+    "nodes": [
+      {
+        "id": "owl:Thing",
+        "label": "owl:Thing",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "root",
+        "details": {
+          "descripcion": "Clase raíz universal de la ontología OWL"
+        }
+      },
+      {
+        "id": "Residuo",
+        "label": "Residuo",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Residuo",
+          "label": "Residuo",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "ResiduoOrdinario",
+        "label": "Residuo Ordinario",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "ResiduoOrdinario",
+          "label": "Residuo Ordinario",
+          "parent": "Residuo",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "ResiduoRAEE",
+        "label": "Residuo RAEE",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "ResiduoRAEE",
+          "label": "Residuo RAEE",
+          "parent": "Residuo",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "TipoRAEE",
+        "label": "Tipo RAEE",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "TipoRAEE",
+          "label": "Tipo RAEE",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "TipoRAEEPeligroso",
+        "label": "Tipo RAEE Peligroso",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "TipoRAEEPeligroso",
+          "label": "Tipo RAEE Peligroso",
+          "parent": "TipoRAEE",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Zona",
+        "label": "Zona",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Zona",
+          "label": "Zona",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "ComunaUrbana",
+        "label": "Comuna Urbana",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "ComunaUrbana",
+          "label": "Comuna Urbana",
+          "parent": "Zona",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Corregimiento",
+        "label": "Corregimiento",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Corregimiento",
+          "label": "Corregimiento",
+          "parent": "Zona",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Vereda",
+        "label": "Vereda",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Vereda",
+          "label": "Vereda",
+          "parent": "Zona",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "ZonaDesatendida",
+        "label": "Zona desatendida",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "definedClass",
+        "isDefined": true,
+        "axiom": "Zona ⊓ (diasSinServicio >= 7)",
+        "details": {
+          "id": "ZonaDesatendida",
+          "label": "Zona desatendida",
+          "parent": "Zona",
+          "isDefined": true,
+          "axiom": "Zona ⊓ (diasSinServicio >= 7)"
+        }
+      },
+      {
+        "id": "ZonaVulnerable",
+        "label": "Zona vulnerable",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "definedClass",
+        "isDefined": true,
+        "axiom": "Zona ⊓ (porcentajeVulnerable >= 25.0)",
+        "details": {
+          "id": "ZonaVulnerable",
+          "label": "Zona vulnerable",
+          "parent": "Zona",
+          "isDefined": true,
+          "axiom": "Zona ⊓ (porcentajeVulnerable >= 25.0)"
+        }
+      },
+      {
+        "id": "PuntoAcopio",
+        "label": "Punto de acopio",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "PuntoAcopio",
+          "label": "Punto de acopio",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "ContenedorOrdinario",
+        "label": "Contenedor Ordinario",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "ContenedorOrdinario",
+          "label": "Contenedor Ordinario",
+          "parent": "PuntoAcopio",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "PuntoAcopioRAEE",
+        "label": "Punto Acopio RAEE",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "PuntoAcopioRAEE",
+          "label": "Punto Acopio RAEE",
+          "parent": "PuntoAcopio",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "PuntoSaturado",
+        "label": "Punto saturado",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "definedClass",
+        "isDefined": true,
+        "axiom": "PuntoAcopio ⊓ (porcentajeSaturacion >= 80)",
+        "details": {
+          "id": "PuntoSaturado",
+          "label": "Punto saturado",
+          "parent": "PuntoAcopio",
+          "isDefined": true,
+          "axiom": "PuntoAcopio ⊓ (porcentajeSaturacion >= 80)"
+        }
+      },
+      {
+        "id": "PuntoEnEntornoSensible",
+        "label": "Punto en Entorno Sensible",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "PuntoEnEntornoSensible",
+          "label": "Punto en Entorno Sensible",
+          "parent": "PuntoAcopio",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "PuntoCritico",
+        "label": "Punto crítico",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "definedClass",
+        "isDefined": true,
+        "axiom": "PuntoSaturado ⊓ (∃ cercaDe.EquipamientoSensible)",
+        "details": {
+          "id": "PuntoCritico",
+          "label": "Punto crítico",
+          "parent": "PuntoAcopio",
+          "isDefined": true,
+          "axiom": "PuntoSaturado ⊓ (∃ cercaDe.EquipamientoSensible)"
+        }
+      },
+      {
+        "id": "Ruta",
+        "label": "Ruta",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Ruta",
+          "label": "Ruta",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Vehiculo",
+        "label": "Vehículo",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Vehiculo",
+          "label": "Vehículo",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "CamionCompactador",
+        "label": "Camión Compactador",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "CamionCompactador",
+          "label": "Camión Compactador",
+          "parent": "Vehiculo",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Volqueta",
+        "label": "Volqueta",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Volqueta",
+          "label": "Volqueta",
+          "parent": "Vehiculo",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Gestor",
+        "label": "Gestor",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Gestor",
+          "label": "Gestor",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "GestorAutorizado",
+        "label": "Gestor Autorizado",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "GestorAutorizado",
+          "label": "Gestor Autorizado",
+          "parent": "Gestor",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "EventoClimatico",
+        "label": "Evento climático",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "EventoClimatico",
+          "label": "Evento climático",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Lluvia",
+        "label": "Lluvia",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Lluvia",
+          "label": "Lluvia",
+          "parent": "EventoClimatico",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "QuejaCiudadana",
+        "label": "Queja ciudadana",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "QuejaCiudadana",
+          "label": "Queja ciudadana",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "EquipamientoSensible",
+        "label": "Equipamiento sensible",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "EquipamientoSensible",
+          "label": "Equipamiento sensible",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Colegio",
+        "label": "Colegio",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Colegio",
+          "label": "Colegio",
+          "parent": "EquipamientoSensible",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "CentroSalud",
+        "label": "Centro de Salud",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "CentroSalud",
+          "label": "Centro de Salud",
+          "parent": "EquipamientoSensible",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "EtiquetaLinguistica",
+        "label": "Etiqueta lingüística",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "EtiquetaLinguistica",
+          "label": "Etiqueta lingüística",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Criticidad",
+        "label": "Criticidad",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Criticidad",
+          "label": "Criticidad",
+          "parent": "EtiquetaLinguistica",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "NivelAccesibilidad",
+        "label": "Nivel de Accesibilidad",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "NivelAccesibilidad",
+          "label": "Nivel de Accesibilidad",
+          "parent": "EtiquetaLinguistica",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "DecisionPriorizacion",
+        "label": "Decisión de priorización",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "DecisionPriorizacion",
+          "label": "Decisión de priorización",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Recomendacion",
+        "label": "Recomendación",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "Recomendacion",
+          "label": "Recomendación",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "CriterioPriorizacion",
+        "label": "Criterio de priorización",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "CriterioPriorizacion",
+          "label": "Criterio de priorización",
+          "parent": "owl:Thing",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "CriterioLegitimo",
+        "label": "Criterio Legítimo",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "CriterioLegitimo",
+          "label": "Criterio Legítimo",
+          "parent": "CriterioPriorizacion",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "CriterioExcluido",
+        "label": "Criterio Excluido",
+        "layer": "T-Box",
+        "domainGroup": "Jerarquia",
+        "kind": "class",
+        "isDefined": false,
+        "axiom": null,
+        "details": {
+          "id": "CriterioExcluido",
+          "label": "Criterio Excluido",
+          "parent": "CriterioPriorizacion",
+          "isDefined": false,
+          "axiom": null
+        }
+      },
+      {
+        "id": "Criticidad_Baja",
+        "label": "Criticidad Baja",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "Criticidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criticidad_Baja",
+          "label": "Criticidad Baja",
+          "assertedClass": "Criticidad",
+          "inferredClasses": [
+            "Criticidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criticidad_Media",
+        "label": "Criticidad Media",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "Criticidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criticidad_Media",
+          "label": "Criticidad Media",
+          "assertedClass": "Criticidad",
+          "inferredClasses": [
+            "Criticidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criticidad_Alta",
+        "label": "Criticidad Alta",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "Criticidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criticidad_Alta",
+          "label": "Criticidad Alta",
+          "assertedClass": "Criticidad",
+          "inferredClasses": [
+            "Criticidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criticidad_Critica",
+        "label": "Criticidad Critica",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "Criticidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criticidad_Critica",
+          "label": "Criticidad Critica",
+          "assertedClass": "Criticidad",
+          "inferredClasses": [
+            "Criticidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "NivelAccesibilidad_Buena",
+        "label": "NivelAccesibilidad Buena",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "NivelAccesibilidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "NivelAccesibilidad_Buena",
+          "label": "NivelAccesibilidad Buena",
+          "assertedClass": "NivelAccesibilidad",
+          "inferredClasses": [
+            "NivelAccesibilidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "NivelAccesibilidad_Regular",
+        "label": "NivelAccesibilidad Regular",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "NivelAccesibilidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "NivelAccesibilidad_Regular",
+          "label": "NivelAccesibilidad Regular",
+          "assertedClass": "NivelAccesibilidad",
+          "inferredClasses": [
+            "NivelAccesibilidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "NivelAccesibilidad_Mala",
+        "label": "NivelAccesibilidad Mala",
+        "layer": "A-Box",
+        "domainGroup": "Etiquetas",
+        "kind": "individual",
+        "assertedClass": "NivelAccesibilidad",
+        "hermitInferences": [],
+        "details": {
+          "id": "NivelAccesibilidad_Mala",
+          "label": "NivelAccesibilidad Mala",
+          "assertedClass": "NivelAccesibilidad",
+          "inferredClasses": [
+            "NivelAccesibilidad",
+            "EtiquetaLinguistica"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etiquetas",
+          "dataProperties": {},
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Gestor_EcoRAEE",
+        "label": "Gestor EcoRAEE",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "GestorAutorizado",
+        "hermitInferences": [],
+        "details": {
+          "id": "Gestor_EcoRAEE",
+          "label": "Gestor EcoRAEE",
+          "assertedClass": "GestorAutorizado",
+          "inferredClasses": [
+            "GestorAutorizado",
+            "Gestor"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "disponible": true,
+            "estaAutorizado": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Gestor_RecuperaTech",
+        "label": "Gestor RecuperaTech",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "GestorAutorizado",
+        "hermitInferences": [],
+        "details": {
+          "id": "Gestor_RecuperaTech",
+          "label": "Gestor RecuperaTech",
+          "assertedClass": "GestorAutorizado",
+          "inferredClasses": [
+            "GestorAutorizado",
+            "Gestor"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "disponible": true,
+            "estaAutorizado": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Comuna_1_Centro",
+        "label": "Zona Comuna 1 Centro",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "ComunaUrbana",
+        "hermitInferences": [
+          "ZonaVulnerable"
+        ],
+        "details": {
+          "id": "Zona_Comuna_1_Centro",
+          "label": "Zona Comuna 1 Centro",
+          "assertedClass": "ComunaUrbana",
+          "inferredClasses": [
+            "ComunaUrbana",
+            "Zona",
+            "ZonaVulnerable"
+          ],
+          "hermitInferences": [
+            "ZonaVulnerable"
+          ],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.65,
+            "longitud": -74.08,
+            "sensibilidadEntorno": 82,
+            "diasSinServicio": 1,
+            "demandaEsperada": 740,
+            "poblacionVulnerable": 2940,
+            "porcentajeVulnerable": 30.0
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Comuna_2_Norte",
+        "label": "Zona Comuna 2 Norte",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "ComunaUrbana",
+        "hermitInferences": [],
+        "details": {
+          "id": "Zona_Comuna_2_Norte",
+          "label": "Zona Comuna 2 Norte",
+          "assertedClass": "ComunaUrbana",
+          "inferredClasses": [
+            "ComunaUrbana",
+            "Zona"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.685,
+            "longitud": -74.055,
+            "sensibilidadEntorno": 42,
+            "diasSinServicio": 2,
+            "demandaEsperada": 510
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Comuna_3_Parque",
+        "label": "Zona Comuna 3 Parque",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "ComunaUrbana",
+        "hermitInferences": [],
+        "details": {
+          "id": "Zona_Comuna_3_Parque",
+          "label": "Zona Comuna 3 Parque",
+          "assertedClass": "ComunaUrbana",
+          "inferredClasses": [
+            "ComunaUrbana",
+            "Zona"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.668,
+            "longitud": -74.1,
+            "sensibilidadEntorno": 90,
+            "diasSinServicio": 1,
+            "demandaEsperada": 620
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Comuna_4_Industrial",
+        "label": "Zona Comuna 4 Industrial",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "ComunaUrbana",
+        "hermitInferences": [],
+        "details": {
+          "id": "Zona_Comuna_4_Industrial",
+          "label": "Zona Comuna 4 Industrial",
+          "assertedClass": "ComunaUrbana",
+          "inferredClasses": [
+            "ComunaUrbana",
+            "Zona"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.63,
+            "longitud": -74.04,
+            "sensibilidadEntorno": 35,
+            "diasSinServicio": 3,
+            "demandaEsperada": 460
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Vereda_El_Encanto",
+        "label": "Zona Vereda El Encanto",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "Vereda",
+        "hermitInferences": [
+          "ZonaVulnerable",
+          "ZonaDesatendida"
+        ],
+        "details": {
+          "id": "Zona_Vereda_El_Encanto",
+          "label": "Zona Vereda El Encanto",
+          "assertedClass": "Vereda",
+          "inferredClasses": [
+            "Vereda",
+            "Zona",
+            "ZonaVulnerable",
+            "ZonaDesatendida"
+          ],
+          "hermitInferences": [
+            "ZonaVulnerable",
+            "ZonaDesatendida"
+          ],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.695,
+            "longitud": -74.135,
+            "sensibilidadEntorno": 68,
+            "diasSinServicio": 9,
+            "demandaEsperada": 90,
+            "poblacionVulnerable": 180,
+            "porcentajeVulnerable": 28.1
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Vereda_Alto_Verde",
+        "label": "Zona Vereda Alto Verde",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "Vereda",
+        "hermitInferences": [],
+        "details": {
+          "id": "Zona_Vereda_Alto_Verde",
+          "label": "Zona Vereda Alto Verde",
+          "assertedClass": "Vereda",
+          "inferredClasses": [
+            "Vereda",
+            "Zona"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.61,
+            "longitud": -74.14,
+            "sensibilidadEntorno": 52,
+            "diasSinServicio": 5,
+            "demandaEsperada": 75
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Zona_Corregimiento_La_Esperanza",
+        "label": "Zona Corregimiento La Esperanza",
+        "layer": "A-Box",
+        "domainGroup": "Zonas",
+        "kind": "individual",
+        "assertedClass": "Corregimiento",
+        "hermitInferences": [],
+        "details": {
+          "id": "Zona_Corregimiento_La_Esperanza",
+          "label": "Zona Corregimiento La Esperanza",
+          "assertedClass": "Corregimiento",
+          "inferredClasses": [
+            "Corregimiento",
+            "Zona"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Zonas",
+          "dataProperties": {
+            "latitud": 4.69,
+            "longitud": -74.02,
+            "sensibilidadEntorno": 58,
+            "diasSinServicio": 4,
+            "demandaEsperada": 130
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Colegio_San_Jose",
+        "label": "Colegio San Jose",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "Colegio",
+        "hermitInferences": [],
+        "details": {
+          "id": "Colegio_San_Jose",
+          "label": "Colegio San Jose",
+          "assertedClass": "Colegio",
+          "inferredClasses": [
+            "Colegio",
+            "EquipamientoSensible"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {},
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Comuna_3_Parque"
+            }
+          ]
+        }
+      },
+      {
+        "id": "RAEE_Baterias",
+        "label": "RAEE Baterias",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEEPeligroso",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Baterias",
+          "label": "RAEE Baterias",
+          "assertedClass": "TipoRAEEPeligroso",
+          "inferredClasses": [
+            "TipoRAEEPeligroso",
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "RAEE_Celulares",
+        "label": "RAEE Celulares",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Celulares",
+          "label": "RAEE Celulares",
+          "assertedClass": "TipoRAEE",
+          "inferredClasses": [
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "RAEE_Electrodomesticos",
+        "label": "RAEE Electrodomesticos",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Electrodomesticos",
+          "label": "RAEE Electrodomesticos",
+          "assertedClass": "TipoRAEE",
+          "inferredClasses": [
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": false
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "RAEE_Cables",
+        "label": "RAEE Cables",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Cables",
+          "label": "RAEE Cables",
+          "assertedClass": "TipoRAEE",
+          "inferredClasses": [
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": false
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "RAEE_Tarjetas",
+        "label": "RAEE Tarjetas",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Tarjetas",
+          "label": "RAEE Tarjetas",
+          "assertedClass": "TipoRAEE",
+          "inferredClasses": [
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "RAEE_Bombillas",
+        "label": "RAEE Bombillas",
+        "layer": "A-Box",
+        "domainGroup": "ResiduosRAEE",
+        "kind": "individual",
+        "assertedClass": "TipoRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "RAEE_Bombillas",
+          "label": "RAEE Bombillas",
+          "assertedClass": "TipoRAEE",
+          "inferredClasses": [
+            "TipoRAEE"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "ResiduosRAEE",
+          "dataProperties": {
+            "esPeligroso": true
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Acopio_Central",
+        "label": "Acopio Central",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "PuntoAcopioRAEE",
+        "hermitInferences": [
+          "PuntoSaturado",
+          "PuntoCritico"
+        ],
+        "details": {
+          "id": "Acopio_Central",
+          "label": "Acopio Central",
+          "assertedClass": "PuntoAcopioRAEE",
+          "inferredClasses": [
+            "PuntoAcopioRAEE",
+            "PuntoAcopio",
+            "PuntoSaturado",
+            "PuntoCritico"
+          ],
+          "hermitInferences": [
+            "PuntoSaturado",
+            "PuntoCritico"
+          ],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.666,
+            "longitud": -74.098,
+            "saturacionOrdinarios": 85,
+            "porcentajeSaturacion": 85,
+            "saturacionRAEE": 64
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Comuna_3_Parque"
+            },
+            {
+              "property": "cercaDe",
+              "target": "Colegio_San_Jose"
+            },
+            {
+              "property": "gestionadoPor",
+              "target": "Gestor_EcoRAEE"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Baterias"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Celulares"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Acopio_Norte",
+        "label": "Acopio Norte",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "PuntoAcopioRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "Acopio_Norte",
+          "label": "Acopio Norte",
+          "assertedClass": "PuntoAcopioRAEE",
+          "inferredClasses": [
+            "PuntoAcopioRAEE",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.683,
+            "longitud": -74.057,
+            "saturacionOrdinarios": 44,
+            "porcentajeSaturacion": 44,
+            "saturacionRAEE": 25
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Comuna_2_Norte"
+            },
+            {
+              "property": "gestionadoPor",
+              "target": "Gestor_EcoRAEE"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Electrodomesticos"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Acopio_Centro",
+        "label": "Acopio Centro",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "PuntoAcopioRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "Acopio_Centro",
+          "label": "Acopio Centro",
+          "assertedClass": "PuntoAcopioRAEE",
+          "inferredClasses": [
+            "PuntoAcopioRAEE",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.644,
+            "longitud": -74.078,
+            "saturacionOrdinarios": 68,
+            "porcentajeSaturacion": 68,
+            "saturacionRAEE": 38
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Comuna_1_Centro"
+            },
+            {
+              "property": "gestionadoPor",
+              "target": "Gestor_RecuperaTech"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Cables"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Celulares"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Acopio_Industrial",
+        "label": "Acopio Industrial",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "PuntoAcopioRAEE",
+        "hermitInferences": [],
+        "details": {
+          "id": "Acopio_Industrial",
+          "label": "Acopio Industrial",
+          "assertedClass": "PuntoAcopioRAEE",
+          "inferredClasses": [
+            "PuntoAcopioRAEE",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.632,
+            "longitud": -74.037,
+            "saturacionOrdinarios": 57,
+            "porcentajeSaturacion": 57,
+            "saturacionRAEE": 71
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Comuna_4_Industrial"
+            },
+            {
+              "property": "gestionadoPor",
+              "target": "Gestor_RecuperaTech"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Tarjetas"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Cables"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Punto_El_Encanto",
+        "label": "Punto El Encanto",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "ContenedorOrdinario",
+        "hermitInferences": [],
+        "details": {
+          "id": "Punto_El_Encanto",
+          "label": "Punto El Encanto",
+          "assertedClass": "ContenedorOrdinario",
+          "inferredClasses": [
+            "ContenedorOrdinario",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.692,
+            "longitud": -74.132,
+            "saturacionOrdinarios": 72,
+            "porcentajeSaturacion": 72,
+            "saturacionRAEE": 30
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Vereda_El_Encanto"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Baterias"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Punto_Alto_Verde",
+        "label": "Punto Alto Verde",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "ContenedorOrdinario",
+        "hermitInferences": [],
+        "details": {
+          "id": "Punto_Alto_Verde",
+          "label": "Punto Alto Verde",
+          "assertedClass": "ContenedorOrdinario",
+          "inferredClasses": [
+            "ContenedorOrdinario",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.612,
+            "longitud": -74.137,
+            "saturacionOrdinarios": 36,
+            "porcentajeSaturacion": 36,
+            "saturacionRAEE": 20
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Vereda_Alto_Verde"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Punto_La_Esperanza",
+        "label": "Punto La Esperanza",
+        "layer": "A-Box",
+        "domainGroup": "PuntosAcopio",
+        "kind": "individual",
+        "assertedClass": "ContenedorOrdinario",
+        "hermitInferences": [],
+        "details": {
+          "id": "Punto_La_Esperanza",
+          "label": "Punto La Esperanza",
+          "assertedClass": "ContenedorOrdinario",
+          "inferredClasses": [
+            "ContenedorOrdinario",
+            "PuntoAcopio"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "PuntosAcopio",
+          "dataProperties": {
+            "latitud": 4.688,
+            "longitud": -74.023,
+            "saturacionOrdinarios": 61,
+            "porcentajeSaturacion": 61,
+            "saturacionRAEE": 48
+          },
+          "objectProperties": [
+            {
+              "property": "ubicadoEn",
+              "target": "Zona_Corregimiento_La_Esperanza"
+            },
+            {
+              "property": "recibeTipo",
+              "target": "RAEE_Bombillas"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Vehiculo_Compactador_01",
+        "label": "Vehiculo Compactador 01",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "CamionCompactador",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Compactador_01",
+          "label": "Vehiculo Compactador 01",
+          "assertedClass": "CamionCompactador",
+          "inferredClasses": [
+            "CamionCompactador",
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 72,
+            "disponible": true,
+            "latitud": 4.656,
+            "longitud": -74.088
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Vehiculo_Compactador_02",
+        "label": "Vehiculo Compactador 02",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "CamionCompactador",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Compactador_02",
+          "label": "Vehiculo Compactador 02",
+          "assertedClass": "CamionCompactador",
+          "inferredClasses": [
+            "CamionCompactador",
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 60,
+            "disponible": true,
+            "latitud": 4.662,
+            "longitud": -74.068
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Vehiculo_Compactador_03",
+        "label": "Vehiculo Compactador 03",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "CamionCompactador",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Compactador_03",
+          "label": "Vehiculo Compactador 03",
+          "assertedClass": "CamionCompactador",
+          "inferredClasses": [
+            "CamionCompactador",
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 0,
+            "disponible": false,
+            "latitud": 4.645,
+            "longitud": -74.05
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Vehiculo_Volqueta_04",
+        "label": "Vehiculo Volqueta 04",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Volqueta",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Volqueta_04",
+          "label": "Vehiculo Volqueta 04",
+          "assertedClass": "Volqueta",
+          "inferredClasses": [
+            "Volqueta",
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 78,
+            "disponible": true,
+            "latitud": 4.642,
+            "longitud": -74.115
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Vehiculo_Volqueta_05",
+        "label": "Vehiculo Volqueta 05",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Volqueta",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Volqueta_05",
+          "label": "Vehiculo Volqueta 05",
+          "assertedClass": "Volqueta",
+          "inferredClasses": [
+            "Volqueta",
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 65,
+            "disponible": true,
+            "latitud": 4.68,
+            "longitud": -74.125
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Vehiculo_Gestor_RAEE_06",
+        "label": "Vehiculo Gestor RAEE 06",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Vehiculo",
+        "hermitInferences": [],
+        "details": {
+          "id": "Vehiculo_Gestor_RAEE_06",
+          "label": "Vehiculo Gestor RAEE 06",
+          "assertedClass": "Vehiculo",
+          "inferredClasses": [
+            "Vehiculo"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {
+            "capacidadRestantePct": 90,
+            "disponible": true,
+            "latitud": 4.678,
+            "longitud": -74.045
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "EventoClimatico_E1",
+        "label": "EventoClimatico E1",
+        "layer": "A-Box",
+        "domainGroup": "EventosQuejas",
+        "kind": "individual",
+        "assertedClass": "Lluvia",
+        "hermitInferences": [],
+        "details": {
+          "id": "EventoClimatico_E1",
+          "label": "EventoClimatico E1",
+          "assertedClass": "Lluvia",
+          "inferredClasses": [
+            "Lluvia",
+            "EventoClimatico"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "EventosQuejas",
+          "dataProperties": {
+            "severidad": 3,
+            "estadoVia": "Regular",
+            "descripcion": "Lluvia registrada para el escenario E1"
+          },
+          "objectProperties": [
+            {
+              "property": "afectaZona",
+              "target": "Zona_Vereda_El_Encanto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "QuejaCiudadana_E2",
+        "label": "QuejaCiudadana E2",
+        "layer": "A-Box",
+        "domainGroup": "EventosQuejas",
+        "kind": "individual",
+        "assertedClass": "QuejaCiudadana",
+        "hermitInferences": [],
+        "details": {
+          "id": "QuejaCiudadana_E2",
+          "label": "QuejaCiudadana E2",
+          "assertedClass": "QuejaCiudadana",
+          "inferredClasses": [
+            "QuejaCiudadana"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "EventosQuejas",
+          "dataProperties": {
+            "severidad": 5,
+            "afectaPoblacionVulnerable": false,
+            "descripcion": "Reporte sintético de quema de cables para el escenario E2"
+          },
+          "objectProperties": [
+            {
+              "property": "reportadaEn",
+              "target": "Zona_Comuna_4_Industrial"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Ruta_Urgente_Urbana_01",
+        "label": "Ruta Urgente Urbana 01",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Ruta",
+        "hermitInferences": [],
+        "details": {
+          "id": "Ruta_Urgente_Urbana_01",
+          "label": "Ruta Urgente Urbana 01",
+          "assertedClass": "Ruta",
+          "inferredClasses": [
+            "Ruta"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {},
+          "objectProperties": [
+            {
+              "property": "asignadaA",
+              "target": "Vehiculo_Compactador_01"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Central"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Centro"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Industrial"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Norte"
+            },
+            {
+              "property": "cubreZona",
+              "target": "Zona_Comuna_3_Parque"
+            },
+            {
+              "property": "cubreZona",
+              "target": "Zona_Comuna_1_Centro"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Ruta_Equidad_Rural_01",
+        "label": "Ruta Equidad Rural 01",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Ruta",
+        "hermitInferences": [],
+        "details": {
+          "id": "Ruta_Equidad_Rural_01",
+          "label": "Ruta Equidad Rural 01",
+          "assertedClass": "Ruta",
+          "inferredClasses": [
+            "Ruta"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {},
+          "objectProperties": [
+            {
+              "property": "asignadaA",
+              "target": "Vehiculo_Volqueta_05"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Punto_El_Encanto"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Punto_La_Esperanza"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Punto_Alto_Verde"
+            },
+            {
+              "property": "cubreZona",
+              "target": "Zona_Vereda_El_Encanto"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Ruta_Especial_RAEE_01",
+        "label": "Ruta Especial RAEE 01",
+        "layer": "A-Box",
+        "domainGroup": "Logistica",
+        "kind": "individual",
+        "assertedClass": "Ruta",
+        "hermitInferences": [],
+        "details": {
+          "id": "Ruta_Especial_RAEE_01",
+          "label": "Ruta Especial RAEE 01",
+          "assertedClass": "Ruta",
+          "inferredClasses": [
+            "Ruta"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Logistica",
+          "dataProperties": {},
+          "objectProperties": [
+            {
+              "property": "asignadaA",
+              "target": "Vehiculo_Gestor_RAEE_06"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Industrial"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Punto_El_Encanto"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Acopio_Central"
+            },
+            {
+              "property": "atiendePunto",
+              "target": "Punto_La_Esperanza"
+            }
+          ]
+        }
+      },
+      {
+        "id": "Criterio_Saturacion",
+        "label": "Criterio Saturacion",
+        "layer": "A-Box",
+        "domainGroup": "Etica",
+        "kind": "individual",
+        "assertedClass": "CriterioLegitimo",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criterio_Saturacion",
+          "label": "Criterio Saturacion",
+          "assertedClass": "CriterioLegitimo",
+          "inferredClasses": [
+            "CriterioLegitimo",
+            "CriterioPriorizacion"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etica",
+          "dataProperties": {
+            "esLegitimo": true,
+            "descripcion": "Nivel de llenado o rebosamiento de contenedores"
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criterio_SensibilidadEntorno",
+        "label": "Criterio SensibilidadEntorno",
+        "layer": "A-Box",
+        "domainGroup": "Etica",
+        "kind": "individual",
+        "assertedClass": "CriterioLegitimo",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criterio_SensibilidadEntorno",
+          "label": "Criterio SensibilidadEntorno",
+          "assertedClass": "CriterioLegitimo",
+          "inferredClasses": [
+            "CriterioLegitimo",
+            "CriterioPriorizacion"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etica",
+          "dataProperties": {
+            "esLegitimo": true,
+            "descripcion": "Cercanía a colegios, centros de salud o fuentes de agua"
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criterio_DiasSinServicio",
+        "label": "Criterio DiasSinServicio",
+        "layer": "A-Box",
+        "domainGroup": "Etica",
+        "kind": "individual",
+        "assertedClass": "CriterioLegitimo",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criterio_DiasSinServicio",
+          "label": "Criterio DiasSinServicio",
+          "assertedClass": "CriterioLegitimo",
+          "inferredClasses": [
+            "CriterioLegitimo",
+            "CriterioPriorizacion"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etica",
+          "dataProperties": {
+            "esLegitimo": true,
+            "descripcion": "Días acumulados sin atención para garantizar equidad territorial"
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criterio_RelacionesPersonales",
+        "label": "Criterio RelacionesPersonales",
+        "layer": "A-Box",
+        "domainGroup": "Etica",
+        "kind": "individual",
+        "assertedClass": "CriterioExcluido",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criterio_RelacionesPersonales",
+          "label": "Criterio RelacionesPersonales",
+          "assertedClass": "CriterioExcluido",
+          "inferredClasses": [
+            "CriterioExcluido",
+            "CriterioPriorizacion"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etica",
+          "dataProperties": {
+            "esLegitimo": false,
+            "descripcion": "Favoritismo por conocidos del operario (excluido por sesgo)"
+          },
+          "objectProperties": []
+        }
+      },
+      {
+        "id": "Criterio_VisibilidadPolitica",
+        "label": "Criterio VisibilidadPolitica",
+        "layer": "A-Box",
+        "domainGroup": "Etica",
+        "kind": "individual",
+        "assertedClass": "CriterioExcluido",
+        "hermitInferences": [],
+        "details": {
+          "id": "Criterio_VisibilidadPolitica",
+          "label": "Criterio VisibilidadPolitica",
+          "assertedClass": "CriterioExcluido",
+          "inferredClasses": [
+            "CriterioExcluido",
+            "CriterioPriorizacion"
+          ],
+          "hermitInferences": [],
+          "domainGroup": "Etica",
+          "dataProperties": {
+            "esLegitimo": false,
+            "descripcion": "Priorización por visitas institucionales o politiqueras (excluido por sesgo)"
+          },
+          "objectProperties": []
+        }
+      }
+    ],
+    "edges": [
+      {
+        "from": "Residuo",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ResiduoOrdinario",
+        "to": "Residuo",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ResiduoRAEE",
+        "to": "Residuo",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "TipoRAEE",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "TipoRAEEPeligroso",
+        "to": "TipoRAEE",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Zona",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ComunaUrbana",
+        "to": "Zona",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Corregimiento",
+        "to": "Zona",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Vereda",
+        "to": "Zona",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ZonaDesatendida",
+        "to": "Zona",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ZonaVulnerable",
+        "to": "Zona",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoAcopio",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "ContenedorOrdinario",
+        "to": "PuntoAcopio",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoAcopioRAEE",
+        "to": "PuntoAcopio",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoSaturado",
+        "to": "PuntoAcopio",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoEnEntornoSensible",
+        "to": "PuntoAcopio",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoCritico",
+        "to": "PuntoAcopio",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Ruta",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Vehiculo",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "CamionCompactador",
+        "to": "Vehiculo",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Volqueta",
+        "to": "Vehiculo",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Gestor",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "GestorAutorizado",
+        "to": "Gestor",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "EventoClimatico",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Lluvia",
+        "to": "EventoClimatico",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "QuejaCiudadana",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "EquipamientoSensible",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Colegio",
+        "to": "EquipamientoSensible",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "CentroSalud",
+        "to": "EquipamientoSensible",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "EtiquetaLinguistica",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Criticidad",
+        "to": "EtiquetaLinguistica",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "NivelAccesibilidad",
+        "to": "EtiquetaLinguistica",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "DecisionPriorizacion",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "Recomendacion",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "CriterioPriorizacion",
+        "to": "owl:Thing",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "CriterioLegitimo",
+        "to": "CriterioPriorizacion",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "CriterioExcluido",
+        "to": "CriterioPriorizacion",
+        "label": "subClassOf",
+        "layer": "T-Box",
+        "type": "hierarchy"
+      },
+      {
+        "from": "PuntoAcopio",
+        "to": "Zona",
+        "label": "ubicadoEn",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "Ruta",
+        "to": "Zona",
+        "label": "cubreZona",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "Ruta",
+        "to": "PuntoAcopio",
+        "label": "atiendePunto",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "Ruta",
+        "to": "Vehiculo",
+        "label": "asignadaA",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "PuntoAcopio",
+        "to": "EquipamientoSensible",
+        "label": "cercaDe",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "QuejaCiudadana",
+        "to": "Zona",
+        "label": "reportadaEn",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "EventoClimatico",
+        "to": "Zona",
+        "label": "afectaZona",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "PuntoAcopio",
+        "to": "TipoRAEE",
+        "label": "recibeTipo",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "PuntoAcopioRAEE",
+        "to": "Gestor",
+        "label": "gestionadoPor",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "DecisionPriorizacion",
+        "to": "Criticidad",
+        "label": "tienePrioridad",
+        "layer": "T-Box",
+        "type": "schemaProperty"
+      },
+      {
+        "from": "Criticidad_Baja",
+        "to": "Criticidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criticidad_Media",
+        "to": "Criticidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criticidad_Alta",
+        "to": "Criticidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criticidad_Critica",
+        "to": "Criticidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "NivelAccesibilidad_Buena",
+        "to": "NivelAccesibilidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "NivelAccesibilidad_Regular",
+        "to": "NivelAccesibilidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "NivelAccesibilidad_Mala",
+        "to": "NivelAccesibilidad",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Gestor_EcoRAEE",
+        "to": "GestorAutorizado",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Gestor_RecuperaTech",
+        "to": "GestorAutorizado",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Comuna_1_Centro",
+        "to": "ComunaUrbana",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Comuna_1_Centro",
+        "to": "ZonaVulnerable",
+        "label": "inferredType (HermiT)",
+        "layer": "Bridge",
+        "type": "inference"
+      },
+      {
+        "from": "Zona_Comuna_2_Norte",
+        "to": "ComunaUrbana",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Comuna_3_Parque",
+        "to": "ComunaUrbana",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Comuna_4_Industrial",
+        "to": "ComunaUrbana",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Vereda_El_Encanto",
+        "to": "Vereda",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Vereda_El_Encanto",
+        "to": "ZonaVulnerable",
+        "label": "inferredType (HermiT)",
+        "layer": "Bridge",
+        "type": "inference"
+      },
+      {
+        "from": "Zona_Vereda_El_Encanto",
+        "to": "ZonaDesatendida",
+        "label": "inferredType (HermiT)",
+        "layer": "Bridge",
+        "type": "inference"
+      },
+      {
+        "from": "Zona_Vereda_Alto_Verde",
+        "to": "Vereda",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Zona_Corregimiento_La_Esperanza",
+        "to": "Corregimiento",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Colegio_San_Jose",
+        "to": "Colegio",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Colegio_San_Jose",
+        "to": "Zona_Comuna_3_Parque",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "RAEE_Baterias",
+        "to": "TipoRAEEPeligroso",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "RAEE_Celulares",
+        "to": "TipoRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "RAEE_Electrodomesticos",
+        "to": "TipoRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "RAEE_Cables",
+        "to": "TipoRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "RAEE_Tarjetas",
+        "to": "TipoRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "RAEE_Bombillas",
+        "to": "TipoRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "PuntoAcopioRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "PuntoSaturado",
+        "label": "inferredType (HermiT)",
+        "layer": "Bridge",
+        "type": "inference"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "PuntoCritico",
+        "label": "inferredType (HermiT)",
+        "layer": "Bridge",
+        "type": "inference"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "Zona_Comuna_3_Parque",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "Colegio_San_Jose",
+        "label": "cercaDe",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "Gestor_EcoRAEE",
+        "label": "gestionadoPor",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "RAEE_Baterias",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Central",
+        "to": "RAEE_Celulares",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Norte",
+        "to": "PuntoAcopioRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Acopio_Norte",
+        "to": "Zona_Comuna_2_Norte",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Norte",
+        "to": "Gestor_EcoRAEE",
+        "label": "gestionadoPor",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Norte",
+        "to": "RAEE_Electrodomesticos",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Centro",
+        "to": "PuntoAcopioRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Acopio_Centro",
+        "to": "Zona_Comuna_1_Centro",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Centro",
+        "to": "Gestor_RecuperaTech",
+        "label": "gestionadoPor",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Centro",
+        "to": "RAEE_Cables",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Centro",
+        "to": "RAEE_Celulares",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Industrial",
+        "to": "PuntoAcopioRAEE",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Acopio_Industrial",
+        "to": "Zona_Comuna_4_Industrial",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Industrial",
+        "to": "Gestor_RecuperaTech",
+        "label": "gestionadoPor",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Industrial",
+        "to": "RAEE_Tarjetas",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Acopio_Industrial",
+        "to": "RAEE_Cables",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Punto_El_Encanto",
+        "to": "ContenedorOrdinario",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Punto_El_Encanto",
+        "to": "Zona_Vereda_El_Encanto",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Punto_El_Encanto",
+        "to": "RAEE_Baterias",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Punto_Alto_Verde",
+        "to": "ContenedorOrdinario",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Punto_Alto_Verde",
+        "to": "Zona_Vereda_Alto_Verde",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Punto_La_Esperanza",
+        "to": "ContenedorOrdinario",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Punto_La_Esperanza",
+        "to": "Zona_Corregimiento_La_Esperanza",
+        "label": "ubicadoEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Punto_La_Esperanza",
+        "to": "RAEE_Bombillas",
+        "label": "recibeTipo",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Vehiculo_Compactador_01",
+        "to": "CamionCompactador",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Vehiculo_Compactador_02",
+        "to": "CamionCompactador",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Vehiculo_Compactador_03",
+        "to": "CamionCompactador",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Vehiculo_Volqueta_04",
+        "to": "Volqueta",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Vehiculo_Volqueta_05",
+        "to": "Volqueta",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Vehiculo_Gestor_RAEE_06",
+        "to": "Vehiculo",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "EventoClimatico_E1",
+        "to": "Lluvia",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "EventoClimatico_E1",
+        "to": "Zona_Vereda_El_Encanto",
+        "label": "afectaZona",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "QuejaCiudadana_E2",
+        "to": "QuejaCiudadana",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "QuejaCiudadana_E2",
+        "to": "Zona_Comuna_4_Industrial",
+        "label": "reportadaEn",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Ruta",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Vehiculo_Compactador_01",
+        "label": "asignadaA",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Acopio_Central",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Acopio_Centro",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Acopio_Industrial",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Acopio_Norte",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Zona_Comuna_3_Parque",
+        "label": "cubreZona",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Urgente_Urbana_01",
+        "to": "Zona_Comuna_1_Centro",
+        "label": "cubreZona",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Ruta",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Vehiculo_Volqueta_05",
+        "label": "asignadaA",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Punto_El_Encanto",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Punto_La_Esperanza",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Punto_Alto_Verde",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Equidad_Rural_01",
+        "to": "Zona_Vereda_El_Encanto",
+        "label": "cubreZona",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Ruta",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Vehiculo_Gestor_RAEE_06",
+        "label": "asignadaA",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Acopio_Industrial",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Punto_El_Encanto",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Acopio_Central",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Ruta_Especial_RAEE_01",
+        "to": "Punto_La_Esperanza",
+        "label": "atiendePunto",
+        "layer": "A-Box",
+        "type": "objectProperty"
+      },
+      {
+        "from": "Criterio_Saturacion",
+        "to": "CriterioLegitimo",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criterio_SensibilidadEntorno",
+        "to": "CriterioLegitimo",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criterio_DiasSinServicio",
+        "to": "CriterioLegitimo",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criterio_RelacionesPersonales",
+        "to": "CriterioExcluido",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      },
+      {
+        "from": "Criterio_VisibilidadPolitica",
+        "to": "CriterioExcluido",
+        "label": "rdf:type",
+        "layer": "Bridge",
+        "type": "instantiation"
+      }
+    ]
+  }
+}
